@@ -141,7 +141,7 @@
   .tabs button, .main { min-height: 44px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: inherit; font-size: 1rem }
   .tabs button.on, .main.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent) }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 12px 0 }
-  h3 { margin: 0 0 6px } h3 small { opacity: 0.65; font-weight: 400; margin-left: 6px }
+  h3 { margin: 0 0 6px } h3 small { opacity: 1; font-weight: 400; margin-left: 6px }
   .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px }
   input[type='number'] { width: 64px; min-height: 40px; font-size: 1rem; padding: 0 6px }
   input[type='checkbox'] { width: 20px; height: 20px }

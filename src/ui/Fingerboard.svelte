@@ -19,6 +19,8 @@
   const cy = (d: { m: number; string: number; finger: number }) => (d.finger === 0 ? top - 28 : top + (d.m - OPEN[d.string]) * rowH)
   const fing = (m: number) => noteName(m + SHIFT, shape)
   const snd = (m: number) => noteName(m, cle)
+  // le nom accessible commence par le texte visible (WCAG 2.5.3)
+  const label = (d: { m: number; finger: number }) => `${d.finger} ${mode === 'doigte' ? fing(d.m) : snd(d.m)}${mode === 'les deux' ? ` (${fing(d.m)})` : ''}`
 </script>
 
 <div class="fb">
@@ -28,17 +30,17 @@
     {/each}
   </div>{/if}
   <p class="cap">{#if titre}<b>{titre}</b>{:else}{t('sonne_en')} <b>{keyName(cle)}</b> · {t('forme_de')} <b>{shapeName(cle)}</b>{/if}</p>
-  <svg viewBox="0 0 {W} {H}" role="img" aria-label={t('manche_aria')}>
+  <svg viewBox="0 0 {W} {H}" role="group" aria-label={t("manche_aria")}>
     <rect x={left - 14} y={top - 12} width={gap * 3 + 28} height={rowH * 7 + 24} rx="6" class="board" />
     {#each OPEN as _, s}
       <line x1={x(s)} x2={x(s)} y1={top - 12} y2={top + rowH * 7 + 12} class="str" />
       <text x={x(s)} y="16" text-anchor="middle" class="lbl">{stringLabel(s)}</text>
     {/each}
     {#each dots as d}
-      <g class="dot" onclick={() => playTone(d.m, 1)} onkeydown={(e) => e.key === 'Enter' && playTone(d.m, 1)} role="button" tabindex="0" aria-label="{t('corde_de')} {stringLabel(d.string)}, {t('doigt')} {d.finger}, {t('sonne')} {snd(d.m)}, {t('doigte_n')} {fing(d.m)}">
+      <g class="dot" onclick={() => playTone(d.m, 1)} onkeydown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); playTone(d.m, 1) } }} role="button" tabindex="0" aria-label="{label(d)}: {t('corde_de')} {stringLabel(d.string)}, {t('doigt')} {d.finger}, {t('sonne')} {snd(d.m)}, {t('doigte_n')} {fing(d.m)}">
         <circle cx={x(d.string)} cy={cy(d)} r="15" class:open={d.finger === 0} />
-        <text x={x(d.string)} y={cy(d) + 5} text-anchor="middle" class="num">{d.finger}</text>
-        <text x={x(d.string) + 22} y={cy(d) + (mode === 'les deux' ? -1 : 5)} class="nm">{mode === 'doigte' ? fing(d.m) : snd(d.m)}</text>
+        <text x={x(d.string)} y={cy(d) + 5} text-anchor="middle" class="num">{d.finger}</text>{" "}
+        <text x={x(d.string) + 22} y={cy(d) + (mode === 'les deux' ? -1 : 5)} class="nm">{mode === 'doigte' ? fing(d.m) : snd(d.m)}</text>{" "}
         {#if mode === 'les deux'}<text x={x(d.string) + 22} y={cy(d) + 12} class="nm2">({fing(d.m)})</text>{/if}
       </g>
     {/each}
