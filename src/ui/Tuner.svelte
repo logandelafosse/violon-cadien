@@ -148,11 +148,11 @@
   .meter .mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--line) }
   .needle { position: absolute; top: 2px; bottom: 2px; width: 6px; margin-left: -3px; border-radius: 3px; background: currentColor; transition: left 0.08s linear }
   .needle.ok { background: var(--accent) }
-  .scale { display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.7 }
+  .scale { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--muted) }
   .big { margin: 0 }
   .hint { margin: 0; font-size: 1.15rem; font-weight: 600 }
   .big.ok + .hint { color: var(--accent) }
   .err { color: #b3261e; margin: 0 }
-  .note { font-size: 0.85rem; opacity: 0.7; margin: 0 }
+  .note { font-size: 0.875rem; color: var(--muted); margin: 0 }
   @media (prefers-reduced-motion: reduce) { .needle { transition: none } }
 </style>

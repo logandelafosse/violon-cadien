@@ -1,4 +1,51 @@
 import { dict } from './dict'
 
-// Textes de la zone « today » (vide : à remplir par la branche concernée).
-export default dict({}, {})
+// Textes de la page d'un jour : étapes, bourdon, métronome, carte « c'est fait ».
+export default dict(
+  {
+    objectif_label: 'Objectif :',
+    etapes_aria: 'Étapes de la leçon',
+    ecouter_gamme: 'Écouter la gamme',
+    bourdon_de: 'Bourdon de',
+    en_cours: 'en cours',
+    demarrer: 'Démarrer',
+    moins_vite: 'Moins vite',
+    plus_vite: 'Plus vite',
+    danse_two_step: 'two-step',
+    danse_valse: 'valse',
+    lien_chanson_aria: 'Chansons de ce jour',
+    ecoute_titre_aria: 'À écouter dans ton jeu',
+    autoeval_aria: 'Autoévaluation (non enregistrée)',
+    cest_fait: 'c’est fait.',
+    carte_serie: 'Série :',
+    reste_semaine: 'encore {n} jour(s) pour boucler la semaine {s}',
+    semaine_bouclee: 'Semaine {s} bouclée.',
+    semaine_aria: 'Semaine {s} : {n} jour(s) fait(s) sur 7',
+    jour_suivant: 'Jour suivant',
+    voir_plan: 'Voir le plan',
+    fait_le_court: 'Fait le {d}',
+  },
+  {
+    objectif_label: 'Goal:',
+    etapes_aria: 'Lesson steps',
+    ecouter_gamme: 'Listen to the scale',
+    bourdon_de: 'Drone on',
+    en_cours: 'playing',
+    demarrer: 'Start',
+    moins_vite: 'Slower',
+    plus_vite: 'Faster',
+    danse_two_step: 'two-step',
+    danse_valse: 'waltz',
+    lien_chanson_aria: 'Songs for this day',
+    ecoute_titre_aria: 'What to listen for in your playing',
+    autoeval_aria: 'Self-check (not saved)',
+    cest_fait: 'done.',
+    carte_serie: 'Streak:',
+    reste_semaine: '{n} more day(s) to complete week {s}',
+    semaine_bouclee: 'Week {s} complete.',
+    semaine_aria: 'Week {s}: {n} day(s) done out of 7',
+    jour_suivant: 'Next day',
+    voir_plan: 'See the plan',
+    fait_le_court: 'Done on {d}',
+  },
+)

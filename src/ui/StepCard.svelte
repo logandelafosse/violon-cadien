@@ -3,72 +3,115 @@
   import Fingerboard from './Fingerboard.svelte'
   import Tuner from './Tuner.svelte'
   import Icon from './Icon.svelte'
-  import { OPEN, stringLabel, majorScale, pentatonic } from '../theory/fiddle'
+  import Stepper from './Stepper.svelte'
+  import Beats from './Beats.svelte'
+  import { OPEN, stringLabel, noteName, majorScale, pentatonic } from '../theory/fiddle'
   import { playNotes, playTone, startDrone, stopDrone, startMetronome, stopMetronome } from '../audio/engine'
   import { t, i18n } from '../i18n.svelte'
   let { step, index }: { step: Step; index: number } = $props()
   let drone = $state(false), metro = $state(false), beat = $state(-1)
   let tuner = $state(false)
+  let sounding = $state<number | null>(null) // corde qui sonne (2 s)
+  let cur = $state<number | null>(null)       // note en cours dans « Écouter »
   let bpm = $state(step.metro?.bpm ?? 60)
+  let soundTimer: ReturnType<typeof setTimeout> | undefined
 
+  const droneNames = $derived((step.bourdon ?? []).map((m) => noteName(m)).join(' + '))
+
+  function pressString(i: number, m: number) {
+    playTone(m, 2)
+    sounding = i
+    clearTimeout(soundTimer)
+    soundTimer = setTimeout(() => (sounding = null), 2000)
+  }
   function toggleDrone() { drone = !drone; if (drone) startDrone(step.bourdon!); else stopDrone() }
   function toggleMetro() {
     metro = !metro
     if (metro) startMetronome(bpm, step.metro!.mesure, (b) => (beat = b)); else { stopMetronome(); beat = -1 }
   }
+  // La lecture monte puis redescend : l'indice joué est ramené à l'indice de la note dans la liste affichée.
+  const shown = (i: number | null, n: number) => (i === null ? null : i < n ? i : 2 * (n - 1) - i)
   function listenNotes() {
     const n = step.notes!.notes
     if (step.notes!.ensemble) n.forEach((m) => playTone(m, 1.6))
-    else playNotes([...n, ...n.slice(0, -1).reverse()], 80, 1)
+    else playNotes([...n, ...n.slice(0, -1).reverse()], 80, 1, (i) => (cur = shown(i, n.length)))
   }
   function listen() {
     const g = step.gamme!
     const up = g.type === 'pentatonique' ? pentatonic(g.cle, g.de, g.a) : majorScale(g.cle, g.de, g.a)
-    playNotes([...up, ...up.slice(0, -1).reverse()], 90, 0.9)
+    playNotes([...up, ...up.slice(0, -1).reverse()], 90, 0.9, (i) => (cur = shown(i, up.length)))
   }
-  $effect(() => () => { stopDrone(); stopMetronome() })
+  $effect(() => () => { stopDrone(); stopMetronome(); clearTimeout(soundTimer) })
 </script>
 
-<section class="card">
-  <h3><span class="n">{index + 1}</span> {step.titre} <small>{step.minutes} {t('min')}</small></h3>
-  <p>{step.texte}</p>
-  {#if step.cordes}
-    <div class="row">
-      {#each OPEN as m, i}<button onclick={() => playTone(m, 2)}>{stringLabel(i)}</button>{/each}
-      {#if !tuner}<button onclick={() => (tuner = true)}>{t('tuner_ouvrir')}</button>{/if}
+<article class="card" aria-labelledby="step-{index}">
+  <div class="head">
+    <span class="n" aria-hidden="true">{index + 1}</span>
+    <div class="title">
+      <h3 id="step-{index}">{step.titre}</h3>
+      <span class="mins">{step.minutes} {t('min')}</span>
     </div>
+  </div>
+  <p class="txt">{step.texte}</p>
+
+  {#if step.cordes}
+    <div class="strings">
+      {#each OPEN as m, i}
+        <button type="button" class="pill" class:sounding={sounding === i} onclick={() => pressString(i, m)}>
+          {#if sounding === i}<Icon name="listen" size={16} />{/if}{stringLabel(i)}
+        </button>
+      {/each}
+    </div>
+    {#if !tuner}<button type="button" class="outline" onclick={() => (tuner = true)}><Icon name="tune" size={20} />{t('tuner_ouvrir')}</button>{/if}
     {#if tuner}<Tuner onclose={() => (tuner = false)} />{/if}
   {/if}
+
   {#if step.notes}
-    <Fingerboard cle={step.notes.cle} notes={step.notes.notes} titre={i18n.lang === 'en' ? (step.notes.titreEn ?? step.notes.titre) : step.notes.titre} />
-    <button class="ico" onclick={listenNotes}><Icon name="play" size={16} />{t('ecouter')}</button>
+    <div class="fb"><Fingerboard cle={step.notes.cle} notes={step.notes.notes} titre={i18n.lang === 'en' ? (step.notes.titreEn ?? step.notes.titre) : step.notes.titre} playing={cur ?? undefined} /></div>
+    <button type="button" class="outline" onclick={listenNotes}><Icon name="play" size={20} />{t('ecouter')}</button>
   {/if}
   {#if step.gamme}
-    <Fingerboard cle={step.gamme.cle} de={step.gamme.de} a={step.gamme.a} type={step.gamme.type} />
-    <button class="ico" onclick={listen}><Icon name="play" size={16} />{t('ecouter')}</button>
+    <div class="fb"><Fingerboard cle={step.gamme.cle} de={step.gamme.de} a={step.gamme.a} type={step.gamme.type} playing={cur ?? undefined} /></div>
+    <button type="button" class="outline" onclick={listen}><Icon name="play" size={20} />{t('ecouter_gamme')}</button>
   {/if}
-  <div class="row">
-    {#if step.bourdon}<button class="ico" class:on={drone} onclick={toggleDrone}><Icon name={drone ? 'stop' : 'drone'} size={16} />{drone ? t('stop_bourdon') : t('bourdon')}</button>{/if}
-    {#if step.metro}
-      <button class="ico" class:on={metro} onclick={toggleMetro}><Icon name={metro ? 'stop' : 'metronome'} size={16} />{metro ? t('stop') : t('metro')}</button>
-      <label>{t('tempo')} <input type="number" min="40" max="160" bind:value={bpm} disabled={metro} /></label>
-      {#if metro}<span class="beat" aria-hidden="true">{#each Array(step.metro.mesure) as _, i}<i class:hit={beat === i}></i>{/each}</span>{/if}
-    {/if}
-  </div>
-</section>
+
+  {#if step.bourdon}
+    <button type="button" class="toggle" class:on={drone} aria-pressed={drone} onclick={toggleDrone}>
+      <Icon name={drone ? 'stop' : 'drone'} size={22} />{t('bourdon_de')} {droneNames}{drone ? ` · ${t('en_cours')}` : ''}
+    </button>
+  {/if}
+
+  {#if step.metro}
+    <div class="metro">
+      <button type="button" class="primary" aria-pressed={metro} onclick={toggleMetro}>
+        <Icon name={metro ? 'stop' : 'metronome'} size={20} />{metro ? t('stop') : t('demarrer')}
+      </button>
+      <label class="tempo"><span>{t('tempo')}</span>
+        <Stepper bind:value={bpm} min={40} max={160} label={t('tempo')} decLabel={t('moins_vite')} incLabel={t('plus_vite')} disabled={metro} />
+      </label>
+      <div class="beats"><Beats count={step.metro.mesure} current={metro ? beat : -1} /></div>
+    </div>
+  {/if}
+</article>
 
 <style>
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 12px 0 }
-  h3 { margin: 0 0 6px; font-size: 1.05rem }
-  h3 small { opacity: 0.6; font-weight: 400; margin-left: 6px }
-  .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 0.85rem; margin-right: 4px }
-  p { line-height: 1.5; margin: 6px 0 }
-  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px }
-  button { min-height: 44px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: inherit; font-size: 1rem }
-  button.ico { display: inline-flex; align-items: center; gap: 6px }
-  button.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent) }
-  input { width: 64px; min-height: 40px; font-size: 1rem; padding: 0 6px }
-  .beat { display: inline-flex; gap: 6px }
-  .beat i { width: 16px; height: 16px; border-radius: 50%; background: var(--line) }
-  .beat i.hit { background: var(--accent) }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s-4); display: flex; flex-direction: column; gap: 14px }
+  .head { display: flex; align-items: flex-start; gap: var(--s-3) }
+  .n { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--fg); color: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-weight: 700; font-size: var(--t-md) }
+  .title { flex: 1; display: flex; flex-direction: column; gap: 2px }
+  h3 { margin: 0; font-size: var(--t-md); font-weight: 700; line-height: 1.25 }
+  .mins { font-size: var(--t-sm); color: var(--muted) }
+  .txt { margin: 0; font-size: var(--t-base); line-height: var(--lh) }
+  .strings { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2) }
+  .pill { min-height: 56px; border-radius: var(--r-pill); border: 2px solid var(--fg); background: transparent; color: var(--fg); font-weight: 700; font-size: 1.125rem; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer }
+  .pill.sounding { background: var(--fg); color: var(--bg) }
+  .fb { display: flex; justify-content: center }
+  .outline, .toggle, .primary { min-height: 48px; border-radius: var(--r); font-weight: 700; font-size: 1.0625rem; display: flex; align-items: center; justify-content: center; gap: var(--s-2); cursor: pointer }
+  .outline { border: 2px solid var(--accent); background: transparent; color: var(--accent) }
+  .toggle { min-height: 56px; border: 2px solid var(--accent); background: transparent; color: var(--accent); font-size: 1.125rem; gap: 10px }
+  .toggle.on, .primary { background: var(--accent); color: var(--on-accent); border: 2px solid var(--accent) }
+  .primary { min-height: 52px; padding: 0 18px }
+  .metro { display: flex; align-items: flex-end; gap: var(--s-3); flex-wrap: wrap }
+  .tempo { display: flex; flex-direction: column; gap: 4px; font-size: var(--t-sm); font-weight: 700; color: var(--muted) }
+  .beats { margin-left: auto; min-height: 52px; display: flex; align-items: center }
 </style>
