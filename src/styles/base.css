@@ -25,7 +25,6 @@ input[type='checkbox'] { width: 24px; height: 24px; vertical-align: middle }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important }
 }
 /* contraste : les <small> des titres de cartes (StepCard, Songs) restent pleinement opaques */
-main h3 small:not(#x) { opacity: 1 }
 
 /* Bois du manche : deux dégradés sur var(--board) + ombre sous le sillet */
 .wood {

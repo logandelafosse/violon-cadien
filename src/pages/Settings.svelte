@@ -82,7 +82,7 @@
   <p class="note">{t('set_theme_note')}</p>
 </section>
 
-<PupitreToggle />
+<section class="card"><PupitreToggle /></section>
 
 <section class="card" aria-labelledby="s-a4">
   <h3 id="s-a4"><span class="ic"><Icon name="tune" size={24} /></span>{t('a4_titre')}</h3>

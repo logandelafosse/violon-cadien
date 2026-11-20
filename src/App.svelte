@@ -45,5 +45,5 @@
 {/if}
 
 <style>
-  .shell { max-width: 640px; margin: 0 auto; padding: 16px 16px 90px }
+  .shell { max-width: 640px; margin: 0 auto; padding: 16px 16px calc(96px + env(safe-area-inset-bottom)) }
 </style>
