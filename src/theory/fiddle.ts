@@ -56,6 +56,7 @@ export function position(midi: number, key: KeyName): Pos | null {
   for (let i = 3; i >= 0; i--) if (OPEN[i] <= midi) { s = i; break }
   if (s < 0 || midi - OPEN[s] > 7) return null
   if (midi === OPEN[s]) return { string: s, finger: 0 }
-  const between = majorScale(key, OPEN[s] + 1, midi).length
+  // Le doigt 1 est à 2 demi-tons de la corde à vide : une note à 1 demi-ton (ex. Fa♯3 sur la corde de Fa en Sol majeur) ne compte pas.
+  const between = majorScale(key, OPEN[s] + 2, midi).length
   return { string: s, finger: between }
 }

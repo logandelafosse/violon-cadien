@@ -23,3 +23,17 @@ describe('gammes', () => {
     expect(pentatonic('C', 60, 71).map((m) => noteName(m))).toEqual(['Do', 'Ré', 'Mi', 'Sol', 'La'])
   })
 })
+
+describe('doigts en Sol majeur sur la corde de Fa', () => {
+  it('Sol3 = doigt 1, La3 = doigt 2, Si3 = doigt 3 (pas de doigt 4)', () => {
+    expect(position(55, 'G')).toEqual({ string: 0, finger: 1 })
+    expect(position(57, 'G')).toEqual({ string: 0, finger: 2 })
+    expect(position(59, 'G')).toEqual({ string: 0, finger: 3 })
+  })
+  it('aucun doigt 4 en première position pour les gammes de Do, Sol et Fa', () => {
+    for (const k of ['C', 'G', 'F'] as const) for (let m = 53; m <= 79; m++) {
+      const p = position(m, k)
+      if (p) expect(p.finger, `${k} ${m}`).toBeLessThanOrEqual(3)
+    }
+  })
+})
