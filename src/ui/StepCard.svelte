@@ -2,6 +2,7 @@
   import type { Step } from '../content/types'
   import Fingerboard from './Fingerboard.svelte'
   import Tuner from './Tuner.svelte'
+  import Icon from './Icon.svelte'
   import { OPEN, stringLabel, majorScale, pentatonic } from '../theory/fiddle'
   import { playNotes, playTone, startDrone, stopDrone, startMetronome, stopMetronome } from '../audio/engine'
   import { t, i18n } from '../i18n.svelte'
@@ -40,16 +41,16 @@
   {/if}
   {#if step.notes}
     <Fingerboard cle={step.notes.cle} notes={step.notes.notes} titre={i18n.lang === 'en' ? (step.notes.titreEn ?? step.notes.titre) : step.notes.titre} />
-    <button onclick={listenNotes}>{t('ecouter')}</button>
+    <button class="ico" onclick={listenNotes}><Icon name="play" size={16} />{t('ecouter')}</button>
   {/if}
   {#if step.gamme}
     <Fingerboard cle={step.gamme.cle} de={step.gamme.de} a={step.gamme.a} type={step.gamme.type} />
-    <button onclick={listen}>{t('ecouter')}</button>
+    <button class="ico" onclick={listen}><Icon name="play" size={16} />{t('ecouter')}</button>
   {/if}
   <div class="row">
-    {#if step.bourdon}<button class:on={drone} onclick={toggleDrone}>{drone ? t('stop_bourdon') : t('bourdon')}</button>{/if}
+    {#if step.bourdon}<button class="ico" class:on={drone} onclick={toggleDrone}><Icon name={drone ? 'stop' : 'drone'} size={16} />{drone ? t('stop_bourdon') : t('bourdon')}</button>{/if}
     {#if step.metro}
-      <button class:on={metro} onclick={toggleMetro}>{metro ? t('stop') : t('metro')}</button>
+      <button class="ico" class:on={metro} onclick={toggleMetro}><Icon name={metro ? 'stop' : 'metronome'} size={16} />{metro ? t('stop') : t('metro')}</button>
       <label>{t('tempo')} <input type="number" min="40" max="160" bind:value={bpm} disabled={metro} /></label>
       {#if metro}<span class="beat" aria-hidden="true">{#each Array(step.metro.mesure) as _, i}<i class:hit={beat === i}></i>{/each}</span>{/if}
     {/if}
@@ -64,6 +65,7 @@
   p { line-height: 1.5; margin: 6px 0 }
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px }
   button { min-height: 44px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: inherit; font-size: 1rem }
+  button.ico { display: inline-flex; align-items: center; gap: 6px }
   button.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent) }
   input { width: 64px; min-height: 40px; font-size: 1rem; padding: 0 6px }
   .beat { display: inline-flex; gap: 6px }

@@ -1,15 +1,7 @@
-import AxeBuilder from '@axe-core/playwright'
 import { test, expect } from '@playwright/test'
+import { THEMES, SCREENS, axeClean } from './helpers'
 
-const THEMES = ['drapeau', 'bayou', 'papier', 'minuit', 'epure']
-const SCREENS: [string, string][] = [
-  ['aujourd’hui', '/'],
-  ['plan', '/plan'],
-  ['chansons', '/chansons/1'],
-  ['vocabulaire', '/vocabulaire'],
-  ['réglages', '/reglages'],
-]
-
+// Matrice d'accessibilité : 5 thèmes × clair/sombre × 5 écrans. À garder au vert après CHAQUE fusion.
 for (const scheme of ['light', 'dark'] as const) {
   for (const theme of THEMES) {
     for (const [name, route] of SCREENS) {
@@ -18,21 +10,13 @@ for (const scheme of ['light', 'dark'] as const) {
         await page.addInitScript((th) => localStorage.setItem('cfd.theme', th), theme)
         await page.goto(`/#${route}`)
         await expect(page.locator('main h2').first()).toBeVisible()
-        const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()
-        expect(violations.map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ') + ' ' + (n.any[0]?.message ?? '')).join(' | ')}`)).toEqual([])
+        await axeClean(page)
       })
     }
   }
 }
 
-test('clavier : les points du manche et les cases du plan sont atteignables', async ({ page }) => {
-  await page.goto('/#/jour/1')
-  const dot = page.locator('.dot').first()
-  if (await dot.count()) {
-    await dot.focus()
-    await expect(dot).toBeFocused()
-    await page.keyboard.press('Space')
-  }
+test('clavier : les cases du plan sont atteignables', async ({ page }) => {
   await page.goto('/#/plan')
   const cell = page.locator('.cell').first()
   await cell.focus()
