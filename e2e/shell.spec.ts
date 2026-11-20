@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
-import { nav } from './helpers'
+import { nav, axeClean } from './helpers'
 
-// Coque de l'application : en-tête, langue, thème, polices, hors ligne.
+// Coque de l'application : en-tête, langue, thème, progression, barre d'onglets, polices, hors ligne.
 
 test('premier chargement : leçon du jour 1 en français', async ({ page }) => {
   await page.goto('/')
@@ -14,8 +14,12 @@ test('premier chargement : leçon du jour 1 en français', async ({ page }) => {
 test('changement de langue : interface et noms de notes', async ({ page }) => {
   await page.goto('/#/chansons/1')
   await expect(page.locator('body')).toContainText(/\b(Do|Ré|Sol)\b/)
-  await page.getByRole('switch').click()
+  const langue = page.getByRole('group', { name: 'Langue' })
+  await expect(langue.getByRole('button', { name: 'FR' })).toHaveAttribute('aria-pressed', 'true')
+  await langue.getByRole('button', { name: 'EN' }).click()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  // le nom du groupe suit la langue : il s'appelle maintenant « Language »
+  await expect(page.getByRole('group', { name: 'Language' }).getByRole('button', { name: 'EN' })).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Day by Day')
   await expect(page.locator('nav')).toContainText('Settings')
   await expect(page.locator('body')).not.toContainText(/\b(Ré|Mi bémol)\b/)
@@ -24,16 +28,93 @@ test('changement de langue : interface et noms de notes', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
-test('thème : data-theme change, persiste, et la couleur de la barre suit', async ({ page }) => {
+test('thème : le bouton ouvre le choix, data-theme change, persiste, et la couleur de la barre suit', async ({ page }) => {
   await page.goto('/')
-  await page.locator('.themesel select').selectOption('minuit')
+  const bouton = page.getByRole('button', { name: /^Thème :/ })
+  await expect(bouton).toHaveAttribute('aria-expanded', 'false')
+  await bouton.click()
+  await expect(bouton).toHaveAttribute('aria-expanded', 'true')
+  const choix = page.getByRole('group', { name: 'Thème' })
+  // le focus va sur le thème actif
+  await expect(choix.getByRole('radio', { checked: true })).toBeFocused()
+  await choix.getByRole('radio', { name: 'Minuit' }).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'minuit')
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#0b0a08')
+  // le panneau reste ouvert pour comparer, et le bouton annonce le thème courant
+  await expect(choix).toBeVisible()
+  await expect(bouton).toHaveAttribute('aria-label', 'Thème : Minuit')
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'minuit')
   await nav(page, /Réglages/)
   await page.locator('.th').nth(2).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'papier')
+})
+
+test('thème : Échap ferme le panneau et rend le focus au bouton ; un clic dehors le ferme aussi', async ({ page }) => {
+  await page.goto('/')
+  const bouton = page.getByRole('button', { name: /^Thème :/ })
+  const choix = page.getByRole('group', { name: 'Thème' })
+  await bouton.click()
+  await expect(choix).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(choix).toHaveCount(0)
+  await expect(bouton).toBeFocused()
+  await expect(bouton).toHaveAttribute('aria-expanded', 'false')
+  await bouton.click()
+  await expect(choix).toBeVisible()
+  await page.locator('main h2').first().click({ position: { x: 2, y: 2 } })
+  await expect(choix).toHaveCount(0)
+  // le bouton fermer rend aussi le focus
+  await bouton.click()
+  await page.getByRole('button', { name: 'Fermer le choix du thème' }).click()
+  await expect(choix).toHaveCount(0)
+  await expect(bouton).toBeFocused()
+})
+
+test('thème : les flèches changent de thème dans le panneau ouvert', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: /^Thème :/ }).click()
+  const choix = page.getByRole('group', { name: 'Thème' })
+  await expect(choix.getByRole('radio', { name: 'Drapeau' })).toBeFocused()
+  await page.keyboard.press('ArrowRight')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'bayou')
+  await expect(choix.getByRole('radio', { name: 'Bayou' })).toBeFocused()
+})
+
+test('accessibilité : le panneau de thème ouvert passe axe', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: /^Thème :/ }).click()
+  await expect(page.getByRole('group', { name: 'Thème' })).toBeVisible()
+  await axeClean(page)
+})
+
+test('progression : 12 segments, étiquette parlante qui suit les jours faits', async ({ page }) => {
+  await page.goto('/')
+  const barre = page.locator('.weeks')
+  await expect(barre).toHaveAttribute('role', 'img')
+  await expect(barre.locator('.seg')).toHaveCount(12)
+  await expect(barre).toHaveAttribute('aria-label', '0 jours faits sur 84, semaine 1 sur 12')
+  await page.getByRole('button', { name: 'Marquer comme fait' }).click()
+  await expect(barre).toHaveAttribute('aria-label', '1 jours faits sur 84, semaine 1 sur 12')
+  // le premier segment est rempli à 1/7 (14 %)
+  await expect(barre.locator('.seg').first()).toHaveAttribute('style', /--p:\s*14%/)
+  await expect(barre.locator('.seg').nth(1)).toHaveAttribute('style', /--p:\s*0%/)
+})
+
+test('barre d’onglets : liens avec aria-current sur la page courante', async ({ page }) => {
+  await page.goto('/')
+  const barre = page.getByRole('navigation', { name: 'Navigation principale' })
+  const liens = barre.getByRole('link')
+  await expect(liens).toHaveCount(5)
+  await expect(barre.getByRole('link', { name: /Aujourd’hui/ })).toHaveAttribute('aria-current', 'page')
+  await expect(barre.getByRole('link', { name: /Plan/ })).not.toHaveAttribute('aria-current', /.+/)
+  await nav(page, /Chansons/)
+  await expect(page).toHaveURL(/#\/chansons/)
+  await expect(barre.getByRole('link', { name: /Chansons/ })).toHaveAttribute('aria-current', 'page')
+  await expect(barre.getByRole('link', { name: /Aujourd’hui/ })).not.toHaveAttribute('aria-current', /.+/)
+  // un jour précis reste sous l'onglet Aujourd'hui
+  await page.goto('/#/jour/3')
+  await expect(barre.getByRole('link', { name: /Aujourd’hui/ })).toHaveAttribute('aria-current', 'page')
 })
 
 test('polices auto-hébergées chargées', async ({ page }) => {

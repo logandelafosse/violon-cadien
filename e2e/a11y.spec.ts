@@ -30,6 +30,6 @@ test('focus visible et mouvement réduit', async ({ page }) => {
   await page.keyboard.press('Tab')
   const outline = await page.evaluate(() => { const s = getComputedStyle(document.activeElement!); return s.outlineStyle + ' ' + s.outlineWidth })
   expect(outline).not.toMatch(/none|^\S+ 0px/)
-  const dur = await page.evaluate(() => getComputedStyle(document.querySelector('.sw i')!).transitionDuration)
+  const dur = await page.evaluate(() => getComputedStyle(document.querySelector('nav .pill')!).transitionDuration)
   expect(parseFloat(dur)).toBeLessThan(0.01)
 })
