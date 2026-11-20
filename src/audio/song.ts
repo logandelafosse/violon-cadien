@@ -7,10 +7,11 @@ import { DOUBLING, strokes, type Style } from '../content/seconding'
 
 export interface Handle { stop: () => void; duration: number }
 
-/** Joue la chanson `loops` fois : décompte d'une mesure, puis mélodie et/ou accompagnement. */
+/** Joue la chanson `loops` fois : décompte d'une mesure, puis mélodie et/ou accompagnement.
+ * `onNote(i, loop)` : indice de la note qui joue et numéro du tour (0 à loops - 1) ; `onNote(null)` à l'arrêt. */
 export function playSong(
   song: Song, opts: { bpm: number; melodie: boolean; accompagnement: boolean; segondeur: Style | 'off'; loops: number },
-  onNote: (i: number | null) => void, onEnd: () => void,
+  onNote: (i: number | null, loop?: number) => void, onEnd: () => void,
 ): Handle {
   const c = audio()
   const beat = 60 / opts.bpm
@@ -75,7 +76,7 @@ export function playSong(
     song.melodie.forEach((n, i) => {
       const t = start + pos * beat
       if (opts.melodie) reed(c, n.m, t, n.d * beat * 0.95, 0.12, master)
-      timers.push(window.setTimeout(() => onNote(i), Math.max(0, (t - c.currentTime) * 1000)))
+      timers.push(window.setTimeout(() => onNote(i, L), Math.max(0, (t - c.currentTime) * 1000)))
       pos += n.d
     })
   }
