@@ -1,1 +1,6 @@
-/* Mode pupitre (rempli par la branche feat/mode-pupitre) : très gros texte, une étape à la fois. */
+/* Mode pupitre : tout est en rem, donc un seul réglage agrandit l'ensemble.
+   L'attribut data-pupitre est posé sur <html> seulement pendant que la vue plein écran est affichée. */
+:root[data-pupitre] {
+  font-size: 160%;
+  --touch: 72px;
+}
