@@ -1,4 +1,4 @@
-import { audio, reed, accordion, addStopper } from './engine'
+import { audio, reed, accordion, addStopper, reverb } from './engine'
 import { getA4 } from './a4'
 import { freq } from '../theory/fiddle'
 import { holdAwake, releaseAwake } from './session'
@@ -17,6 +17,8 @@ export function playSong(
   const beat = 60 / opts.bpm
   const a4 = getA4()
   const master = c.createGain(); master.gain.value = 1; master.connect(c.destination)
+  // Départ de réverbération propre à cette chanson : sans lui, les notes déjà programmées continuaient à sonner par la réverbération après l'arrêt.
+  const wet = c.createGain(); wet.gain.value = 1; wet.connect(reverb(c))
   const t0 = c.currentTime + 0.1
   const count = song.mesure // temps de décompte
   const barBeats = song.mesure
@@ -41,7 +43,7 @@ export function playSong(
     lp.connect(g); g.connect(master)
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.55, t + 0.012); g.gain.exponentialRampToValueAtTime(0.001, t + beat * 0.85)
   }
-  const chuck = (ms: number[], t: number) => ms.forEach((m) => accordion(c, m, t, beat * 0.28, 0.06, master))
+  const chuck = (ms: number[], t: number) => ms.forEach((m) => accordion(c, m, t, beat * 0.28, 0.06, master, wet))
 
   for (let i = 0; i < count; i++) click(t0 + i * beat, i === 0)
 
@@ -64,10 +66,10 @@ export function playSong(
           const g = k.fort ? 0.09 : 0.06
           if (k.kind === 'roule') {
             // le long coup roule de la corde grave vers l'aiguë : trois sons très rapprochés
-            ;[lo - 12, lo, hi].forEach((m, i) => reed(c, m, t + i * 0.025, k.d * beat * 0.95, g, master))
+            ;[lo - 12, lo, hi].forEach((m, i) => reed(c, m, t + i * 0.025, k.d * beat * 0.95, g, master, wet))
           } else {
-            reed(c, lo, t, k.d * beat * 0.9, g, master)
-            reed(c, hi, t, k.d * beat * 0.9, g, master)
+            reed(c, lo, t, k.d * beat * 0.9, g, master, wet)
+            reed(c, hi, t, k.d * beat * 0.9, g, master, wet)
           }
         })
       })
@@ -75,7 +77,7 @@ export function playSong(
     let pos = 0
     song.melodie.forEach((n, i) => {
       const t = start + pos * beat
-      if (opts.melodie) reed(c, n.m, t, n.d * beat * 0.95, 0.12, master)
+      if (opts.melodie) reed(c, n.m, t, n.d * beat * 0.95, 0.12, master, wet)
       timers.push(window.setTimeout(() => onNote(i, L), Math.max(0, (t - c.currentTime) * 1000)))
       pos += n.d
     })
@@ -93,7 +95,8 @@ export function playSong(
       finish()
       timers.forEach(clearTimeout)
       master.gain.cancelScheduledValues(c.currentTime); master.gain.setTargetAtTime(0, c.currentTime, 0.02)
-      setTimeout(() => master.disconnect(), 200)
+      wet.gain.cancelScheduledValues(c.currentTime); wet.gain.setTargetAtTime(0, c.currentTime, 0.02)
+      setTimeout(() => { master.disconnect(); wet.disconnect() }, 200)
       onNote(null)
     },
   }

@@ -21,7 +21,7 @@ export function audio() {
 
 // --- réverbération partagée (impulsion bruitée, courte) ---
 let verb: ConvolverNode | null = null
-function reverb(c: AudioContext) {
+export function reverb(c: AudioContext) {
   if (verb) return verb
   const len = Math.floor(c.sampleRate * 1.3)
   const buf = c.createBuffer(2, len, c.sampleRate)
@@ -36,7 +36,8 @@ function reverb(c: AudioContext) {
 }
 
 /** Voix de violon : dents de scie légèrement désaccordées, filtre qui s'ouvre, vibrato retardé, résonances du corps. */
-export function reed(c: AudioContext, midi: number, t: number, dur: number, gain: number, dest: AudioNode) {
+/** `wet` : où envoyer la réverbération (par défaut le bus commun ; une chanson passe son propre départ pour pouvoir le couper). */
+export function reed(c: AudioContext, midi: number, t: number, dur: number, gain: number, dest: AudioNode, wet: AudioNode = reverb(c)) {
   const f0 = freq(midi, getA4())
   const g = c.createGain()
   const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.7
@@ -51,7 +52,7 @@ export function reed(c: AudioContext, midi: number, t: number, dur: number, gain
     const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f0; o.detune.value = det
     lfoG.connect(o.detune); o.connect(lp); return o
   })
-  lp.connect(body1); body1.connect(body2); body2.connect(g); g.connect(dest); g.connect(reverb(c))
+  lp.connect(body1); body1.connect(body2); body2.connect(g); g.connect(dest); g.connect(wet)
   g.gain.setValueAtTime(0, t)
   g.gain.linearRampToValueAtTime(gain, t + 0.05)
   g.gain.setValueAtTime(gain * 0.9, t + Math.max(dur - 0.08, 0.06))
@@ -61,7 +62,7 @@ export function reed(c: AudioContext, midi: number, t: number, dur: number, gain
 }
 
 /** Voix d'accordéon (anches « musette » : une anche légèrement plus haute, une octave plus bas en sourdine). */
-export function accordion(c: AudioContext, midi: number, t: number, dur: number, gain: number, dest: AudioNode) {
+export function accordion(c: AudioContext, midi: number, t: number, dur: number, gain: number, dest: AudioNode, wet: AudioNode = reverb(c)) {
   const f0 = freq(midi, getA4())
   const g = c.createGain()
   const bp = c.createBiquadFilter(); bp.type = 'lowpass'; bp.frequency.value = 2600
@@ -75,7 +76,7 @@ export function accordion(c: AudioContext, midi: number, t: number, dur: number,
     o.type = r.type; o.frequency.value = r.f; o.detune.value = r.det; og.gain.value = r.v
     o.connect(og); og.connect(bp); o.start(t); o.stop(t + dur + 0.05)
   })
-  bp.connect(nasal); nasal.connect(g); g.connect(dest); g.connect(reverb(c))
+  bp.connect(nasal); nasal.connect(g); g.connect(dest); g.connect(wet)
   g.gain.setValueAtTime(0, t)
   g.gain.linearRampToValueAtTime(gain, t + 0.015)
   g.gain.exponentialRampToValueAtTime(0.0005, t + dur)
