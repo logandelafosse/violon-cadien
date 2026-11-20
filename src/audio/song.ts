@@ -1,4 +1,7 @@
-import { audio, reed, accordion } from './engine'
+import { audio, reed, accordion, addStopper } from './engine'
+import { getA4 } from './a4'
+import { freq } from '../theory/fiddle'
+import { holdAwake, releaseAwake } from './session'
 import { BASS, CHUCK, type Song } from '../content/songs'
 import { DOUBLING, strokes, type Style } from '../content/seconding'
 
@@ -11,6 +14,7 @@ export function playSong(
 ): Handle {
   const c = audio()
   const beat = 60 / opts.bpm
+  const a4 = getA4()
   const master = c.createGain(); master.gain.value = 1; master.connect(c.destination)
   const t0 = c.currentTime + 0.1
   const count = song.mesure // temps de décompte
@@ -25,7 +29,7 @@ export function playSong(
     o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.07)
   }
   const bass = (m: number, t: number) => {
-    const f = 440 * Math.pow(2, (m - 69) / 12)
+    const f = freq(m, a4)
     const g = c.createGain(), lp = c.createBiquadFilter()
     lp.type = 'lowpass'; lp.frequency.value = 700
     ;[['triangle', f, 0.4], ['sawtooth', f, 0.12], ['sine', f / 2, 0.2]].forEach(([ty, fr, v]) => {
@@ -76,14 +80,21 @@ export function playSong(
     })
   }
   const end = (count + opts.loops * total) * beat
-  timers.push(window.setTimeout(() => { onNote(null); onEnd() }, (t0 - c.currentTime + end) * 1000))
-  return {
+  const id = 'song' + Math.random()
+  holdAwake(id)
+  let done = false
+  const finish = () => { if (done) return false; done = true; unreg(); releaseAwake(id); return true }
+  const unreg = addStopper(() => handle.stop())
+  timers.push(window.setTimeout(() => { finish(); onNote(null); onEnd() }, (t0 - c.currentTime + end) * 1000))
+  const handle: Handle = {
     duration: end,
     stop() {
+      finish()
       timers.forEach(clearTimeout)
       master.gain.cancelScheduledValues(c.currentTime); master.gain.setTargetAtTime(0, c.currentTime, 0.02)
       setTimeout(() => master.disconnect(), 200)
       onNote(null)
     },
   }
+  return handle
 }

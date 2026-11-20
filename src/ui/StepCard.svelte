@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { Step } from '../content/types'
   import Fingerboard from './Fingerboard.svelte'
+  import Tuner from './Tuner.svelte'
   import { OPEN, stringLabel, majorScale, pentatonic } from '../theory/fiddle'
   import { playNotes, playTone, startDrone, stopDrone, startMetronome, stopMetronome } from '../audio/engine'
   import { t, i18n } from '../i18n.svelte'
   let { step, index }: { step: Step; index: number } = $props()
   let drone = $state(false), metro = $state(false), beat = $state(-1)
+  let tuner = $state(false)
   let bpm = $state(step.metro?.bpm ?? 60)
 
   function toggleDrone() { drone = !drone; if (drone) startDrone(step.bourdon!); else stopDrone() }
@@ -32,7 +34,9 @@
   {#if step.cordes}
     <div class="row">
       {#each OPEN as m, i}<button onclick={() => playTone(m, 2)}>{stringLabel(i)}</button>{/each}
+      {#if !tuner}<button onclick={() => (tuner = true)}>{t('tuner_ouvrir')}</button>{/if}
     </div>
+    {#if tuner}<Tuner onclose={() => (tuner = false)} />{/if}
   {/if}
   {#if step.notes}
     <Fingerboard cle={step.notes.cle} notes={step.notes.notes} titre={i18n.lang === 'en' ? (step.notes.titreEn ?? step.notes.titre) : step.notes.titre} />
