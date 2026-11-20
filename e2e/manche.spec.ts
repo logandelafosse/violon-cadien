@@ -4,7 +4,8 @@ import { test, expect } from '@playwright/test'
 
 test('clavier : les points du manche sont atteignables', async ({ page }) => {
   await page.goto('/#/jour/1')
-  const dot = page.locator('.dot').first()
+  // `.dot` existe aussi sur les points de temps du métronome (Beats) : on ne vise que les points cliquables du manche.
+  const dot = page.locator('[role="button"].dot, button.dot').first()
   if (await dot.count()) {
     await dot.focus()
     await expect(dot).toBeFocused()
