@@ -9,7 +9,16 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: { baseURL: 'http://localhost:4173/', trace: 'retain-on-failure', locale: 'fr-FR' },
-  projects: [{ name: 'chromium', use: { ...devices['Pixel 7'], browserName: 'chromium' } }],
+  // Chromium (Pixel 7) par défaut ; Firefox et WebKit (moteur de Safari, profil iPhone) avec E2E_ALL=1.
+  projects: [
+    { name: 'chromium', use: { ...devices['Pixel 7'], browserName: 'chromium' } },
+    ...(process.env.E2E_ALL
+      ? [
+          { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 412, height: 915 } } },
+          { name: 'webkit', use: { ...devices['iPhone 14'] } },
+        ]
+      : []),
+  ],
   webServer: {
     command: 'npm run build && npx vite preview --port 4173 --strictPort',
     url: 'http://localhost:4173/',

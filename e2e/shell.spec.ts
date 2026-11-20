@@ -62,8 +62,17 @@ test('thème : Échap ferme le panneau et rend le focus au bouton ; un clic deho
   await expect(bouton).toHaveAttribute('aria-expanded', 'false')
   await bouton.click()
   await expect(choix).toBeVisible()
-  await page.locator('main h2').first().click({ position: { x: 2, y: 2 } })
-  await expect(choix).toHaveCount(0)
+  // Clic en dehors du panneau : juste sous lui s'il reste de la place (sur un petit téléphone il peut couvrir tout le contenu ;
+  // dans ce cas, la fermeture se fait par Échap ou par le bouton Fermer, testés autour).
+  const box = (await choix.boundingBox())!
+  const vh = page.viewportSize()!.height
+  if (box.y + box.height + 12 < vh - 80) {
+    await page.mouse.click(8, box.y + box.height + 12)
+    await expect(choix).toHaveCount(0)
+  } else {
+    await page.keyboard.press('Escape')
+    await expect(choix).toHaveCount(0)
+  }
   // le bouton fermer rend aussi le focus
   await bouton.click()
   await page.getByRole('button', { name: 'Fermer le choix du thème' }).click()
