@@ -1,0 +1,111 @@
+// English translation of days.ts, matched by day number and by step order.
+export interface DayEn { titre: string; objectif: string; etapes: { titre: string; texte: string }[]; ecoute: string[]; autoeval: string[] }
+
+const tune = 'Tune the fiddle: F – C – G – D (from the lowest string to the highest). Press the button to hear each string, then gently turn the peg or fine tuner until the two sounds stop "beating".'
+
+export const DAYS_EN: Record<number, DayEn> = {
+  1: { titre: 'The fiddle tuned down a whole step', objectif: 'Learn the sounding names of the open strings and make long, even bow strokes.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Open strings', texte: 'Play each open string with a long bow: 4 beats down-bow, 4 beats up-bow, at 60 on the metronome. Keep the bow parallel to the bridge with an even sound from start to finish.' },
+      { titre: 'Your note names', texte: 'The strings sound F, C, G, D. These are the SOUNDING names, the ones your friend hears on their C accordion. For fingering, you play as if the fiddle were tuned normally (G-D-A-E): the "fingered" name is a whole step higher. Say the sounding name out loud as you play.' },
+      { titre: 'Playing with a drone', texte: 'Let the C drone run and play the open C string, then the open G string. Listen for how calm and stable it sounds.' },
+    ],
+    ecoute: ['The sound does not scratch or whistle.', 'The tuned strings no longer "beat" together.'], autoeval: ['I can name the 4 strings (F, C, G, D).', 'My bow stays straight.'] },
+  2: { titre: 'Open strings in a two-step rhythm', objectif: 'Alternate between the C and G strings with a two-step (2-beat) pulse.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Two-beat pulse', texte: 'Play one down-bow (beat 1) and one up-bow (beat 2) on the C string. Accent beat 1. 70 on the metronome.' },
+      { titre: 'Crossing strings', texte: 'Alternate: 4 bars on the C string, 4 bars on the G string. Change strings without noise: the arm moves, not just the wrist.' },
+    ],
+    ecoute: ['Beat 1 is stronger than beat 2.'], autoeval: ['I change strings without touching the other one.'] },
+  3: { titre: 'C D E F on the C string', objectif: 'Place fingers 1, 2, 3 to play D, E, F on the C string.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Hand shape', texte: 'On the C string: open = C, finger 1 = D, finger 2 = E, finger 3 = F. Fingers 2 and 3 are touching (half step E–F). This is your "high 2" shape: the same shape a normally tuned violinist uses to play D E F♯ G.' },
+      { titre: 'The scale, slowly', texte: 'Play C-D-E-F and back down, one note per bow, with the C drone. Listen to each note so that it sounds "calm" against the drone.' },
+      { titre: 'Remember', texte: 'Look at the fingerboard on the right: the numbers are your fingers, the names are what you hear.' },
+    ],
+    ecoute: ['E and F sound close together (half step).', 'The open G sounds "right" after F with finger 3.'], autoeval: ['My fingers 2 and 3 are touching.', 'I play C-D-E-F without looking.'] },
+  4: { titre: 'G A B C: the full C scale', objectif: 'Repeat the same shape on the G string to finish the C major octave.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Same shape, other string', texte: 'On the G string: open = G, 1 = A, 2 = B, 3 = C. Exactly the same shape as on the C string. That is why the C scale is "easy": two strings, one shape.' },
+      { titre: 'Full scale', texte: 'Play C-D-E-F-G-A-B-C, then back down. 60 on the metronome, one bow per note, with the C drone.' },
+      { titre: 'Self-check', texte: 'Play the scale once without correcting yourself, just listening. Which notes sound too high or too low?' },
+    ],
+    ecoute: ['The open G (2nd string) sounds right with the C you fingered just before.', 'B → C is a half step.'], autoeval: ['I play the C scale without mixing up fingers.'] },
+  5: { titre: 'High 2 versus low 2', objectif: 'Hear the difference between a high 2nd finger and a low 2nd finger.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'High 2', texte: 'On the G string: G-A-B (high 2, far from finger 1). This is the B in the C and G scales.' },
+      { titre: 'Low 2', texte: 'On the same string, pull finger 2 back against finger 1: G-A-B♭. This is the B♭ of the F scale. Alternate B and B♭ slowly. Listen to the change of colour.' },
+      { titre: 'Note', texte: 'To play in C or G, you mostly use "high 2". For F (B♭), you use "low 2" on the upper strings.' },
+    ],
+    ecoute: ['B♭ sounds "sadder" than B.'], autoeval: ['I can switch from high 2 to low 2 without looking.'] },
+  6: { titre: 'Resonance: listen to finger 3', objectif: 'Use the neighbouring open strings to check that finger 3 is in tune.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Finger 3 = neighbouring string', texte: 'On the C string, play F with finger 3. It should make the open F string ring, an octave lower. On the G string, C with finger 3 makes the C string vibrate. Adjust your finger until you feel the neighbouring string vibrate.' },
+      { titre: 'Adjust your fingers', texte: 'Replay the C scale slowly. On every finger 3, check the resonance.' },
+      { titre: 'Optional', texte: 'Stick small tape markers on the fingerboard at the right spots at first. Remove them later.' },
+    ],
+    ecoute: ['The neighbouring string vibrates when finger 3 is in tune.'], autoeval: ['I feel the resonance on at least one note.'] },
+  7: { titre: 'Week 1 review', objectif: 'Tune without help, play open strings in 2/4 and 3/4, name the notes.',
+    etapes: [
+      { titre: 'Tuning without help', texte: 'Tune on your own, then check with the open strings below.' },
+      { titre: 'Open strings in 2/4 and 3/4', texte: 'Four bars in 2/4 (70), then four bars in 3/4 (90): accent on beat 1.' },
+      { titre: 'The C scale', texte: 'Play C major from bottom to top, saying the sounding names.' },
+    ],
+    ecoute: ['Your tuning holds from the beginning to the end of the session.'], autoeval: ['I can tune my fiddle on my own.', 'I know the sounding names of my strings.'] },
+  8: { titre: 'C major at 60', objectif: 'Play C4–C5 in quarter notes, with a C drone.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Quarter notes at 60', texte: 'One bow per note. Stay relaxed in the shoulder and the wrist.' },
+      { titre: 'Listen to yourself', texte: 'Play each note trying to make the beating with the drone "disappear".' },
+    ],
+    ecoute: ['No beating with the drone.'], autoeval: ['My scale is even.'] },
+  9: { titre: 'C major in eighth notes (two-step)', objectif: 'Two notes per beat, down–up bow, to feel the two-step rhythm.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Two bows per note', texte: 'Play each note twice (down–up) on the beat: C-C, D-D, E-E… at 70.' },
+      { titre: 'Speed up', texte: 'Go up to 80 if it is easy. Drop back to 60 if the notes blur together.' },
+    ],
+    ecoute: ['The two bows per beat are even.'], autoeval: ['I keep the rhythm without rushing.'] },
+  10: { titre: 'Scale degrees 1-3-5 and 1-4-5', objectif: 'Recognise C, E, G (the C chord) and C, F, G (the three chords).',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'C–E–G', texte: 'Play C-E-G-E-C. These are the notes of the C chord.' },
+      { titre: 'C–F–G', texte: 'Play C-F-G-F-C. These are the three "chords" of C: I (C), IV (F), V (G).' },
+      { titre: 'Summary', texte: 'In C, the I is C, the IV is F, the V is G. Remember them: they are the basis of seconding.' },
+    ],
+    ecoute: ['G sounds "waiting", C sounds "at home".'], autoeval: ['I can say which is the I, IV and V in C.'] },
+  11: { titre: 'Reaching down: G, A, B', objectif: 'Play G3, A3, B3 on the F string with a high 3rd finger.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'F string', texte: 'On the F string: open = F, 1 = G, 2 = A, 3 = B♭ (low) or B (with a high 3rd finger). In C major we play B, so a high 3rd finger, far from finger 2.' },
+      { titre: 'Extended scale', texte: 'Play G3 up to C5 and back down.' },
+    ],
+    ecoute: ['B3 sounds "tense" just before C4.'], autoeval: ['I play G-A-B on the F string.'] },
+  12: { titre: 'The full range in C', objectif: 'Play G3 to G5 in first position.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Up and down', texte: 'One note per bow, from G3 to G5, at 60 with the C drone.' },
+      { titre: 'Without looking', texte: 'Play the scale with your eyes closed. Check with the drone.' },
+    ],
+    ecoute: ['Every string change keeps the same volume.'], autoeval: ['I play the whole range without stopping.'] },
+  13: { titre: 'C major in 3/4 (waltz)', objectif: 'Three notes per bow: feel the sway of the waltz.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'Three beats', texte: 'Play the scale notes in groups of 3 (C-D-E, D-E-F, E-F-G…) in a triple pulse, accent on the first note.' },
+      { titre: 'Sway', texte: 'Move your body slightly on beat 1. The Cadien waltz sways, it does not march.' },
+    ],
+    ecoute: ['Beat 1 feels "heavy", beats 2 and 3 feel "light".'], autoeval: ['I feel the 1-2-3 in my body.'] },
+  14: { titre: 'Week 2 review', objectif: 'C major at 72, listen to the drone, check E and B.',
+    etapes: [
+      { titre: 'Tuning', texte: tune },
+      { titre: 'C major at 72', texte: 'Play the C scale over two octaves with the drone, without a break.' },
+      { titre: 'E and B', texte: 'These two notes are often too low. Check them against the drone.' },
+    ],
+    ecoute: ['E and B do not beat with the drone.'], autoeval: ['I played C major at 72 without a mistake.'] },
+}
