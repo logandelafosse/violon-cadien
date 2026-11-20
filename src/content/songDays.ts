@@ -1,19 +1,20 @@
 // Jours de chansons et de triades (semaine 3), générés à partir d'un petit gabarit pour garder le même déroulement chaque jour.
 import type { Day, Step } from './types'
+import type { KeyName } from '../theory/fiddle'
 import type { DayEn } from './days.en'
 
-const tuneFr = 'Accorde le violon : Fa – Do – Sol – Ré (de la corde grave à la corde aiguë). Appuie sur le bouton pour entendre chaque corde, puis tire doucement sur la corde jusqu’à ce que les deux sons ne « battent » plus.'
-const tuneEn = 'Tune the fiddle: F – C – G – D (from the lowest string to the highest). Press the button to hear each string, then gently adjust until the two sounds stop "beating".'
+export const tuneFr = 'Accorde le violon : Fa – Do – Sol – Ré (de la corde grave à la corde aiguë). Appuie sur le bouton pour entendre chaque corde, puis tire doucement sur la corde jusqu’à ce que les deux sons ne « battent » plus.'
+export const tuneEn = 'Tune the fiddle: F – C – G – D (from the lowest string to the highest). Press the button to hear each string, then gently adjust until the two sounds stop "beating".'
 const C = 60
 
-interface Spec {
-  jour: number; titre: string; titreEn: string; objectif: string; objectifEn: string; minutes: number
+export interface Spec {
+  jour: number; cle?: KeyName; titre: string; titreEn: string; objectif: string; objectifEn: string; minutes: number
   warm: { titre: string; titreEn: string; texte: string; texteEn: string; step: Partial<Step> }
   focusFr: string; focusEn: string
   ecoute: [string, string][]; autoeval: [string, string][]
 }
 
-function build(sp: Spec): [Day, DayEn] {
+export function build(sp: Spec): [Day, DayEn] {
   const base = (titre: string, texte: string, extra: Partial<Step> = {}): Step => ({ titre, texte, minutes: 0, ...extra })
   const steps: Step[] = [
     { ...base('Accordage', tuneFr, { cordes: true }), minutes: 2 },
@@ -31,7 +32,7 @@ function build(sp: Spec): [Day, DayEn] {
   ]
   const min = sp.minutes
   const day: Day = {
-    jour: sp.jour, semaine: 3, type: sp.jour === 21 ? 'revue' : 'pratiquer', titre: sp.titre, objectif: sp.objectif, minutes: min, cle: 'C',
+    jour: sp.jour, semaine: Math.ceil(sp.jour / 7), type: sp.jour % 7 === 0 ? 'revue' : 'pratiquer', titre: sp.titre, objectif: sp.objectif, minutes: min, cle: sp.cle ?? 'C',
     etapes: steps, ecoute: sp.ecoute.map((e) => e[0]), autoeval: sp.autoeval.map((e) => e[0]),
   }
   const en: DayEn = { titre: sp.titreEn, objectif: sp.objectifEn, etapes: stepsEn, ecoute: sp.ecoute.map((e) => e[1]), autoeval: sp.autoeval.map((e) => e[1]) }

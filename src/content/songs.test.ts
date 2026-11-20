@@ -62,3 +62,18 @@ describe('découpage en mesures', () => {
     }
   })
 })
+
+describe('chansons en Sol et en Fa, pentatoniques, longues', () => {
+  it('chaque note est jouable en première position dans la tonalité de la chanson', () => {
+    for (const s of SONGS) for (const n of s.melodie) expect(position(n.m, s.cle ?? 'C'), `${s.id} note ${n.m}`).not.toBeNull()
+  })
+  it('les chansons en Sol ont du Fa♯ et pas de Fa ; celles en Fa ont du Si♭ et pas de Si', () => {
+    for (const s of SONGS.filter((x) => x.cle === 'G')) expect(s.melodie.some((n) => n.m % 12 === 5), s.id).toBe(false)
+    for (const s of SONGS.filter((x) => x.cle === 'F')) expect(s.melodie.some((n) => n.m % 12 === 11), s.id).toBe(false)
+  })
+  it('les chansons pentatoniques n’utilisent que cinq notes différentes', () => {
+    for (const j of [36, 37, 38, 39, 40, 41]) for (const s of SONGS.filter((x) => x.jour === j)) {
+      expect(new Set(s.melodie.map((n) => n.m % 12)).size, s.id).toBeLessThanOrEqual(5)
+    }
+  })
+})

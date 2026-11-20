@@ -5,6 +5,7 @@
   import Songs from './ui/Songs.svelte'
   import Glossary from './ui/Glossary.svelte'
   import { WEEKS, OUTLINE } from './content/curriculum'
+  import { songsFor } from './content/songs'
   import { i18n, setLang, t, type Key } from './i18n.svelte'
   import { THEMES, SWATCH, theme, setTheme } from './theme.svelte'
   setLang(i18n.lang)
@@ -19,7 +20,7 @@
   const dayNum = $derived(route.startsWith('/jour/') ? Number(route.slice(6)) : current)
   const day = $derived(dayOf(dayNum))
   const sr = $derived(streak(p))
-  const songDay = $derived(Number(route.split('/')[2]) || Math.min(current, 21))
+  const songDay = $derived(Number(route.split('/')[2]) || Math.min(current, 84))
 
   const outlineOf = (n: number) => OUTLINE.find((o) => o.jour === n)
   const outlineTitle = (n: number) => { const o = outlineOf(n); return o ? (i18n.lang === 'en' ? o.titreEn : o.titre) : t('bientot') }
@@ -91,7 +92,7 @@
       <h2>{day.titre}</h2>
       <p class="goal">{day.objectif}</p>
       {#each day.etapes as s, i}<StepCard step={s} index={i} />{/each}
-      {#if day.jour <= 21}
+      {#if songsFor(day.jour).songs.length}
         <button class="songlink" onclick={() => go(`/chansons/${day.jour}`)}>{t('lien_chanson')}</button>
       {/if}
       <section class="card">

@@ -1,9 +1,15 @@
 import type { Song, Accord } from './songs'
+import { L2 } from './lessonData2'
 
 // Notation compacte : une mesure par segment séparé par « | », une note = nom + octave (C4 = Do central),
 // durée en temps après « : » (1 par défaut). Exemple : « E4 G4:2 ». Hauteurs SONORES.
 const PC: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
-const midi = (n: string) => (Number(n.slice(1)) + 1) * 12 + PC[n[0]]
+/** « F#4 », « Bb3 », « C4 » → numéro MIDI. */
+const midi = (n: string) => {
+  const m = /^([A-G])([#b]?)(\d)$/.exec(n)
+  if (!m) throw new Error(`note invalide : ${n}`)
+  return (Number(m[3]) + 1) * 12 + PC[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0)
+}
 
 export function parseMelody(src: string): { m: number; d: number }[] {
   return src.split('|').flatMap((bar) =>
@@ -14,8 +20,8 @@ export function parseMelody(src: string): { m: number; d: number }[] {
   )
 }
 
-interface Spec { titre: string; titreEn: string; bars: string; accords: string }
-interface Lesson { jour: number; fr: string; en: string; ts: Spec; w: Spec }
+export interface Spec { titre: string; titreEn: string; bars: string; accords: string }
+export interface Lesson { jour: number; cle?: 'C' | 'G' | 'F'; fr: string; en: string; ts?: Spec; w?: Spec }
 
 const L: Lesson[] = [
   { jour: 1, fr: 'Seulement des cordes à vide.', en: 'Open strings only.',
@@ -81,17 +87,17 @@ const L: Lesson[] = [
 ]
 
 function make(l: Lesson, kind: 'ts' | 'w'): Song {
-  const sp = kind === 'ts' ? l.ts : l.w
+  const sp = (kind === 'ts' ? l.ts : l.w)!
   const two = kind === 'ts'
   return {
     jour: l.jour, id: `j${l.jour}-${two ? 'two-step' : 'valse'}`,
     titre: sp.titre, titreEn: sp.titreEn, mesure: two ? 2 : 3, tempo: two ? Math.min(60 + l.jour * 2, 80) : Math.min(80 + l.jour * 2, 100),
     description: `Leçon ${l.jour} : ${l.fr}`, descriptionEn: `Lesson ${l.jour}: ${l.en}`,
-    accords: sp.accords.split(' ') as Accord[], melodie: parseMelody(sp.bars),
+    cle: l.cle ?? 'C', accords: sp.accords.split(' ') as Accord[], melodie: parseMelody(sp.bars),
   }
 }
 
-export const LESSON_SONGS: Song[] = L.flatMap((l) => [make(l, 'ts'), make(l, 'w')])
+export const LESSON_SONGS: Song[] = [...L, ...L2].flatMap((l) => [l.ts && make(l, 'ts'), l.w && make(l, 'w')].filter((x): x is Song => !!x))
 
 // Hauteurs permises par leçon (pour les tests) : ce que l'élève sait déjà jouer ce jour-là.
 const OPEN = [53, 60, 67, 74]

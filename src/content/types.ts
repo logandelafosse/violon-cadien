@@ -4,7 +4,7 @@ export interface Step {
   bourdon?: number[]               // MIDI sonores
   metro?: { bpm: number; mesure: 2 | 3 }
   gamme?: { cle: KeyName; de: number; a: number; type?: 'majeure' | 'pentatonique' }
-  notes?: { cle: KeyName; notes: number[]; titre?: string } // triade ou doubling : notes sonores explicites
+  notes?: { cle: KeyName; notes: number[]; titre?: string; titreEn?: string; ensemble?: boolean } // triade ou doubling : notes sonores explicites
   cordes?: boolean                 // afficher les cordes à vide à écouter
 }
 export interface Day {

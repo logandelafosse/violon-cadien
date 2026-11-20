@@ -1,6 +1,7 @@
 import type { Day } from './types'
 import { DAYS_EN as BASE_EN } from './days.en'
 import { GEN_DAYS, GEN_DAYS_EN } from './songDays'
+import { WEEK_DAYS, WEEK_DAYS_EN } from './weekDays'
 import { i18n } from '../i18n.svelte'
 
 const C = { F3: 53, C4: 60, G4: 67, D5: 74 }
@@ -114,8 +115,8 @@ const BASE_DAYS: Day[] = [
     ],
     ecoute: ['Mi et Si ne battent pas avec le bourdon.'], autoeval: ['J’ai joué Do majeur à 72 sans erreur.'] },
 ]
-export const DAYS: Day[] = [...BASE_DAYS, ...GEN_DAYS]
-export const ALL_EN = { ...BASE_EN, ...GEN_DAYS_EN }
+export const DAYS: Day[] = [...BASE_DAYS, ...GEN_DAYS, ...WEEK_DAYS]
+export const ALL_EN = { ...BASE_EN, ...GEN_DAYS_EN, ...WEEK_DAYS_EN }
 export function dayOf(n: number): Day | undefined {
   const d = DAYS.find((x) => x.jour === n)
   if (!d || i18n.lang === 'fr') return d

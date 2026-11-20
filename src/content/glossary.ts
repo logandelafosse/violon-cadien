@@ -31,7 +31,7 @@ export const GLOSSARY: Term[] = [
   { fr: 'Le shuffle', en: 'The Nashville Shuffle', livre: 'Nashville Shuffle',
     defFr: 'Un long coup d’archet suivi de deux courts : DAH-da-da. Le livret dit qu’il joue tout seul et laisse penser aux notes.',
     defEn: 'One long bow stroke followed by two short ones: DAH-da-da. The booklet says it is almost automatic and lets you think about the notes.' },
-  { fr: 'Harmonie de ténor', en: 'Tenor harmony (modern Cajun 2nd fiddle)', livre: 'modern Cajun 2nd fiddle',
+  { fr: 'Harmonie de ténor', en: 'Tenor harmony (modern 2nd fiddle)', livre: 'modern 2nd fiddle',
     defFr: 'Une façon plus moderne de seconder : le deuxième violon joue une harmonie de ténor par-dessus le lead.',
     defEn: 'A more modern way of seconding: the second fiddle plays a tenor harmony over the lead.' },
   { fr: 'Accords 1, 4, 5', en: 'The 1, 4, 5 chords', livre: '1 chord, 4 chord, 5 chord',

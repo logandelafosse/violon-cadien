@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SONGS, chordName, songTitle, songDesc, type Song, type Accord } from '../content/songs'
+  import { SONGS, songsFor, chordName, songTitle, songDesc, type Song, type Accord } from '../content/songs'
   import { DOUBLING, CHORD_KEY, STYLES, type Style } from '../content/seconding'
   import Fingerboard from './Fingerboard.svelte'
   import type { Key } from '../i18n.svelte'
@@ -8,10 +8,13 @@
   import { t } from '../i18n.svelte'
 
   let { jour = 1, onjour }: { jour?: number; onjour?: (n: number) => void } = $props()
-  const lessons = [...new Set(SONGS.map((s) => s.jour))].sort((a, b) => a - b)
-  const lessonSongs = $derived(SONGS.filter((s) => s.jour === jour).sort((a, b) => a.mesure - b.mesure))
+  const lessons = Array.from({ length: 84 }, (_, i) => i + 1).filter((n) => songsFor(n).songs.length)
+  const jr = $derived(lessons.filter((n) => n <= jour).pop() ?? lessons[0])
+  const found = $derived(songsFor(jr))
+  const lessonSongs = $derived([...found.songs].sort((a, b) => a.mesure - b.mesure))
   let selId = $state('')
   const sel = $derived(lessonSongs.find((s) => s.id === selId) ?? lessonSongs[0])
+  const key = $derived(sel.cle ?? 'C')
   let bpm = $state(80)
   $effect(() => { bpm = sel.tempo })
   let melodie = $state(true), accompagnement = $state(true)
@@ -31,7 +34,7 @@
   const NW = 176, NT = 40, RH = 22, NH = NT + RH * 7 + 16
   const SX = (si: number) => 26 + si * 41
   function place(m: number) {
-    const p = position(m, 'C')
+    const p = position(m, key)
     if (!p) return null
     const semis = m - OPEN[p.string]
     return { x: SX(p.string), y: p.finger === 0 ? NT - 18 : NT + semis * RH, f: p.finger }
@@ -54,10 +57,11 @@
 </script>
 
 <h2>{t('ch_titre')}</h2>
+{#if found.from !== jr}<p class="note">{t('songs_from')} {found.from}.</p>{/if}
 <p class="note">{t('ch_intro')}</p>
 
 <label class="lesson">{t('jour_n')}
-  <select value={jour} onchange={(e) => { stop(); onjour?.(Number(e.currentTarget.value)) }}>
+  <select value={jr} onchange={(e) => { stop(); onjour?.(Number(e.currentTarget.value)) }}>
     {#each lessons as n}<option value={n}>{n}</option>{/each}
   </select>
 </label>
@@ -122,7 +126,7 @@
             {/if}
           {/each}
         </svg>
-        <div class="nm">{bar.notes.map((n, k) => `${'abcdef'[k]} ${noteName(n.m, 'C')}`).join('  ')}</div>
+        <div class="nm">{bar.notes.map((n, k) => `${'abcdef'[k]} ${noteName(n.m, key)}`).join('  ')}</div>
       </div>
     {/each}
   </div>

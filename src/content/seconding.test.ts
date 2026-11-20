@@ -36,9 +36,9 @@ describe('programme', () => {
   it('les jours 22 à 84 ont un titre d’aperçu, une seule fois chacun', () => {
     expect(OUTLINE.map((o) => o.jour)).toEqual(Array.from({ length: 63 }, (_, i) => i + 22))
   })
-  it('12 semaines et jours 1 à 21 écrits', () => {
+  it('12 semaines et les 84 jours écrits', () => {
     expect(WEEKS.length).toBe(12)
-    expect(DAYS.map((d) => d.jour).sort((a, b) => a - b)).toEqual(Array.from({ length: 21 }, (_, i) => i + 1))
+    expect(DAYS.map((d) => d.jour).sort((a, b) => a - b)).toEqual(Array.from({ length: 84 }, (_, i) => i + 1))
   })
   it('le glossaire a une définition française et anglaise partout', () => {
     for (const g of GLOSSARY) { expect(g.defFr.length).toBeGreaterThan(10); expect(g.defEn.length).toBeGreaterThan(10) }

@@ -3,7 +3,7 @@
   import Fingerboard from './Fingerboard.svelte'
   import { OPEN, stringLabel, majorScale, pentatonic } from '../theory/fiddle'
   import { playNotes, playTone, startDrone, stopDrone, startMetronome, stopMetronome } from '../audio/engine'
-  import { t } from '../i18n.svelte'
+  import { t, i18n } from '../i18n.svelte'
   let { step, index }: { step: Step; index: number } = $props()
   let drone = $state(false), metro = $state(false), beat = $state(-1)
   let bpm = $state(step.metro?.bpm ?? 60)
@@ -15,7 +15,8 @@
   }
   function listenNotes() {
     const n = step.notes!.notes
-    playNotes([...n, ...n.slice(0, -1).reverse()], 80, 1)
+    if (step.notes!.ensemble) n.forEach((m) => playTone(m, 1.6))
+    else playNotes([...n, ...n.slice(0, -1).reverse()], 80, 1)
   }
   function listen() {
     const g = step.gamme!
@@ -34,7 +35,7 @@
     </div>
   {/if}
   {#if step.notes}
-    <Fingerboard cle={step.notes.cle} notes={step.notes.notes} titre={step.notes.titre} />
+    <Fingerboard cle={step.notes.cle} notes={step.notes.notes} titre={i18n.lang === 'en' ? (step.notes.titreEn ?? step.notes.titre) : step.notes.titre} />
     <button onclick={listenNotes}>{t('ecouter')}</button>
   {/if}
   {#if step.gamme}
