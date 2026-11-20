@@ -2,6 +2,7 @@
   import { SONGS, songsFor, chordName, songTitle, songDesc, type Song, type Accord } from '../content/songs'
   import { DOUBLING, CHORD_KEY, STYLES, type Style } from '../content/seconding'
   import Fingerboard from './Fingerboard.svelte'
+  import Icon from './Icon.svelte'
   import type { Key } from '../i18n.svelte'
   import { OPEN, stringLabel, noteName, position } from '../theory/fiddle'
   import { playSong, type Handle } from '../audio/song'
@@ -74,7 +75,7 @@
   <h3>{songTitle(sel)} <small>{sel.mesure === 2 ? t('two_step') : t('valse')}</small></h3>
   <p>{songDesc(sel)}</p>
   <div class="row">
-    <button class="main" class:on={playing} onclick={() => (playing ? stop() : play())}>{playing ? t('stop') : t('jouer')}</button>
+    <button class="main" class:on={playing} onclick={() => (playing ? stop() : play())}><Icon name={playing ? 'stop' : 'play'} size={18} /> {playing ? t('stop') : t('jouer')}</button>
     <label>{t('tempo')} <input type="number" min="50" max="140" bind:value={bpm} disabled={playing} /></label>
   </div>
   <div class="row">
@@ -151,8 +152,9 @@
   .neck.hot { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) }
   .neck svg { width: 100%; height: auto; display: block }
   .ch { color: var(--accent2); font-weight: 700; font-size: 0.85rem }
-  .board { fill: var(--board) }
-  .sl { stroke: var(--str); stroke-width: 1.8 }
+  /* anciennes couleurs du manche, en attendant la refonte (--board et --str sont maintenant le bois et l'ivoire) */
+  .board { fill: var(--board-legacy) }
+  .sl { stroke: var(--str-legacy); stroke-width: 1.8 }
   .sn { fill: currentColor; font-size: 11px; font-weight: 700 }
   .path { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: 0.6 }
   .nd { fill: var(--card); stroke: var(--accent); stroke-width: 2 }

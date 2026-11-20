@@ -1,0 +1,46 @@
+/* Six jeux de variables (16 chacun). Drapeau = clair par défaut, sombre quand l'appareil est en mode sombre.
+   --board / --str : bois du manche et cordes (nouveaux). --board-legacy / --str-legacy : anciennes valeurs, gardées
+   pour les anciens composants (Fingerboard, Songs) tant que leurs branches de refonte ne sont pas fusionnées. */
+:root, :root[data-theme='drapeau'] {
+  color-scheme: light dark;
+  --bg: #f6f2e8; --fg: #13213f; --card: #fffdf8; --line: #d8cfba; --muted: #4d5672;
+  --accent: #1b3a8c; --on-accent: #ffffff; --accent2: #c8102e; --on-accent2: #ffffff; --gold-text: #8a5f00;
+  --board: #5e3a20; --str: #eadcb8; --nut: #f1e7cf; --dot: #f7efdc; --on-dot: #1f1408; --focus: #c8102e;
+  --board-legacy: #e9ecf5; --str-legacy: #6c7799;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]), :root[data-theme='drapeau'] {
+    --bg: #0d1530; --fg: #f3efe4; --card: #16203f; --line: #34426d; --muted: #b3bbd3;
+    --accent: #9db8ff; --on-accent: #0d1530; --accent2: #ff8a93; --on-accent2: #2a0509; --gold-text: #f2c14e;
+    --board: #4e2f18; --str: #ead9b2; --nut: #efe3c6; --dot: #f6ead0; --on-dot: #1f1408; --focus: #f2c14e;
+    --board-legacy: #1d2845; --str-legacy: #9fb0e0;
+  }
+}
+:root[data-theme='bayou'] {
+  color-scheme: dark;
+  --bg: #0f1f17; --fg: #efe8d2; --card: #172a20; --line: #2f4a3a; --muted: #b0bfab;
+  --accent: #8fd19e; --on-accent: #0c1a12; --accent2: #e9a23b; --on-accent2: #1f1303; --gold-text: #ecbc5f;
+  --board: #4a2d16; --str: #e8d6ab; --nut: #efe3c3; --dot: #f3e6c4; --on-dot: #1d1408; --focus: #ffd27a;
+  --board-legacy: #22382d; --str-legacy: #a9c9b0;
+}
+:root[data-theme='papier'] {
+  color-scheme: light;
+  --bg: #f2e8d2; --fg: #3a281b; --card: #fbf4e3; --line: #d6c39b; --muted: #66503d;
+  --accent: #7a2e1d; --on-accent: #fbf4e3; --accent2: #2f5d62; --on-accent2: #fbf4e3; --gold-text: #77540c;
+  --board: #6e4223; --str: #f1e1bb; --nut: #f6ead0; --dot: #fbf2dc; --on-dot: #2a1b10; --focus: #2f5d62;
+  --board-legacy: #eadcb9; --str-legacy: #8a7350;
+}
+:root[data-theme='minuit'] {
+  color-scheme: dark;
+  --bg: #0b0a08; --fg: #f6e8d0; --card: #17130e; --line: #3a3024; --muted: #bba98d;
+  --accent: #ffb347; --on-accent: #1a0f00; --accent2: #ff6b57; --on-accent2: #1a0500; --gold-text: #ffc870;
+  --board: #2b1b0e; --str: #e2c08e; --nut: #d9b98a; --dot: #ffd9a0; --on-dot: #1a0f00; --focus: #f6e8d0;
+  --board-legacy: #1e1e24; --str-legacy: #a0a0aa;
+}
+:root[data-theme='epure'] {
+  color-scheme: light;
+  --bg: #ffffff; --fg: #15171c; --card: #f5f6f8; --line: #d9dde4; --muted: #535a67;
+  --accent: #2457d6; --on-accent: #ffffff; --accent2: #1a7f4b; --on-accent2: #ffffff; --gold-text: #7a5b00;
+  --board: #3d424b; --str: #e6e9ee; --nut: #f2f3f5; --dot: #ffffff; --on-dot: #15171c; --focus: #2457d6;
+  --board-legacy: #ececf0; --str-legacy: #777777;
+}

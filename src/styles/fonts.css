@@ -1,0 +1,7 @@
+/* Polices auto-hébergées (OFL), sous-ensemble latin seulement et seulement les graisses utilisées.
+   Zilla Slab : titres. Atkinson Hyperlegible : texte (le vrai italique sert aux noms doigtés et aux termes anglais). */
+@import '@fontsource/zilla-slab/latin-700.css';
+@import '@fontsource/zilla-slab/latin-500-italic.css';
+@import '@fontsource/atkinson-hyperlegible/latin-400.css';
+@import '@fontsource/atkinson-hyperlegible/latin-700.css';
+@import '@fontsource/atkinson-hyperlegible/latin-400-italic.css';

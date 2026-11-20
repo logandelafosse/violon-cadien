@@ -2,7 +2,9 @@
   import { OPEN, stringLabel, SHIFT, noteName, position, shapeKey, shapeName, keyName, majorScale, pentatonic, type KeyName } from '../theory/fiddle'
   import { playTone } from '../audio/engine'
   import { t } from '../i18n.svelte'
-  let { cle, de = 0, a = 0, type = 'majeure', notes: given, titre, compact = false }: { cle: KeyName; de?: number; a?: number; type?: 'majeure' | 'pentatonique'; notes?: number[]; titre?: string; compact?: boolean } = $props()
+  // `playing` : indice de la note en cours de lecture (halo). Sans effet tant que la branche feat/design-manche ne l'a pas branché.
+  let { cle, de = 0, a = 0, type = 'majeure', notes: given, titre, compact = false, playing = undefined }: { cle: KeyName; de?: number; a?: number; type?: 'majeure' | 'pentatonique'; notes?: number[]; titre?: string; compact?: boolean; playing?: number } = $props()
+  $effect(() => { void playing })
   let mode = $state<'son' | 'doigte' | 'les deux'>('les deux')
 
   const notes = $derived(given ?? (type === 'pentatonique' ? pentatonic(cle, de, a) : majorScale(cle, de, a)))
@@ -54,8 +56,9 @@
   .tog button.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent) }
   .cap { font-size: 0.9rem; margin: 4px 0; opacity: 0.85 }
   svg { width: 100%; max-width: 420px; height: auto }
-  .board { fill: var(--board) }
-  .str { stroke: var(--str); stroke-width: 2 }
+  /* anciennes couleurs du manche, en attendant la refonte (--board et --str sont maintenant le bois et l'ivoire) */
+  .board { fill: var(--board-legacy) }
+  .str { stroke: var(--str-legacy); stroke-width: 2 }
   .lbl { fill: currentColor; font-size: 13px; font-weight: 600 }
   .dot { cursor: pointer }
   .dot circle { fill: var(--accent) }

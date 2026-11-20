@@ -81,10 +81,17 @@ export function accordion(c: AudioContext, midi: number, t: number, dur: number,
   g.gain.exponentialRampToValueAtTime(0.0005, t + dur)
 }
 
-/** Joue une suite de notes sonores (MIDI). */
-export function playNotes(notes: number[], bpm = 80, beats = 1) {
+/**
+ * Joue une suite de notes sonores (MIDI). `onNote(i)` est appelée au moment où la note d'indice i commence
+ * (pour allumer le point sur le manche), puis `onNote(null)` à la fin.
+ */
+export function playNotes(notes: number[], bpm = 80, beats = 1, onNote?: (i: number | null) => void) {
   const c = audio(), d = (60 / bpm) * beats
-  notes.forEach((m, i) => reed(c, m, c.currentTime + 0.05 + i * d, d * 0.95, 0.12, c.destination))
+  notes.forEach((m, i) => {
+    reed(c, m, c.currentTime + 0.05 + i * d, d * 0.95, 0.12, c.destination)
+    if (onNote) setTimeout(() => onNote(i), (0.05 + i * d) * 1000)
+  })
+  if (onNote) setTimeout(() => onNote(null), (0.05 + notes.length * d) * 1000)
   return notes.length * d
 }
 
