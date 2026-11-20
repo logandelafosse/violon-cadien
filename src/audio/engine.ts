@@ -1,9 +1,21 @@
 import { freq } from '../theory/fiddle'
+import { getA4 } from './a4'
+import { unlockAudio, installLifecycle, holdAwake, releaseAwake } from './session'
 
 let ctx: AudioContext | null = null
+const stoppers = new Set<() => void>()
+/** Enregistre une action d'arrêt (chansons en cours…) appelée par stopAll(). Renvoie la fonction de retrait. */
+export function addStopper(f: () => void) { stoppers.add(f); return () => { stoppers.delete(f) } }
+/** Coupe tout ce qui joue (bourdon, métronome, chansons) et libère le verrou d'écran. */
+export function stopAll() { stopDrone(); stopMetronome(); [...stoppers].forEach((f) => f()) }
+
 export function audio() {
-  if (!ctx) ctx = new AudioContext()
-  if (ctx.state === 'suspended') ctx.resume()
+  if (!ctx) {
+    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    ctx = new AC()
+    installLifecycle(() => ctx, stopAll)
+  }
+  unlockAudio(ctx)
   return ctx
 }
 
@@ -25,7 +37,7 @@ function reverb(c: AudioContext) {
 
 /** Voix de violon : dents de scie légèrement désaccordées, filtre qui s'ouvre, vibrato retardé, résonances du corps. */
 export function reed(c: AudioContext, midi: number, t: number, dur: number, gain: number, dest: AudioNode) {
-  const f0 = freq(midi)
+  const f0 = freq(midi, getA4())
   const g = c.createGain()
   const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.7
   lp.frequency.setValueAtTime(900, t); lp.frequency.linearRampToValueAtTime(3200, t + 0.12)
@@ -50,7 +62,7 @@ export function reed(c: AudioContext, midi: number, t: number, dur: number, gain
 
 /** Voix d'accordéon (anches « musette » : une anche légèrement plus haute, une octave plus bas en sourdine). */
 export function accordion(c: AudioContext, midi: number, t: number, dur: number, gain: number, dest: AudioNode) {
-  const f0 = freq(midi)
+  const f0 = freq(midi, getA4())
   const g = c.createGain()
   const bp = c.createBiquadFilter(); bp.type = 'lowpass'; bp.frequency.value = 2600
   const nasal = c.createBiquadFilter(); nasal.type = 'peaking'; nasal.frequency.value = 1100; nasal.gain.value = 6; nasal.Q.value = 1.2
@@ -90,13 +102,14 @@ export function startDrone(midis: number[], volume = 0.08) {
     const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400; f.connect(master)
     for (const det of [-5, 5]) {
       const o = c.createOscillator(); o.type = 'sawtooth'
-      o.frequency.value = freq(m); o.detune.value = det
+      o.frequency.value = freq(m, getA4()); o.detune.value = det
       o.connect(f); o.start(); stops.push(() => o.stop())
     }
   }
   droneNodes = { stop: () => { stops.forEach((s) => s()); master.disconnect() } }
+  holdAwake('drone')
 }
-export function stopDrone() { droneNodes?.stop(); droneNodes = null }
+export function stopDrone() { droneNodes?.stop(); droneNodes = null; releaseAwake('drone') }
 
 // --- métronome ---
 let timer: number | null = null
@@ -118,5 +131,6 @@ export function startMetronome(bpm: number, beatsPerBar: 2 | 3 | 4, onBeat?: (be
       next += interval; beat++
     }
   }, 25)
+  holdAwake('metro')
 }
-export function stopMetronome() { if (timer !== null) clearInterval(timer); timer = null }
+export function stopMetronome() { if (timer !== null) clearInterval(timer); timer = null; releaseAwake('metro') }

@@ -55,6 +55,18 @@ const D = {
     nav_vocab: 'Vocabulaire', vocab_titre: 'Vocabulaire du seconding', vocab_intro: 'Les mots viennent du livret de Dewey Balfa et Tracy Schwarz (Folkways, 1976), avec des équivalents en français à valider.', livre: 'Dans le livret',
     plan_semaine: 'Semaine', plan_apercu: 'Aperçu : cette leçon n’est pas encore écrite.', triade: 'Triade',
     theme: 'Thème', th_drapeau: 'Drapeau', th_bayou: 'Bayou', th_papier: 'Vieux papier', th_minuit: 'Minuit', th_epure: 'Épuré',
+    // --- accordeur / calibrage (audio) ---
+    tuner_ouvrir: 'Accordeur au micro (facultatif)', tuner_fermer: 'Fermer l’accordeur', tuner_titre: 'Accordeur',
+    tuner_demarrer: 'Activer le micro', tuner_arret: 'Arrêter',
+    tuner_attente: 'Joue une corde à vide…', tuner_cible: 'Corde visée', tuner_cents: 'cents',
+    tuner_juste: 'Juste', tuner_bas: 'Un peu bas : serre légèrement', tuner_haut: 'Un peu haut : desserre légèrement',
+    tuner_tres_bas: 'Trop bas : serre', tuner_tres_haut: 'Trop haut : desserre',
+    tuner_refuse: 'Micro refusé. Autorise-le dans les réglages du navigateur, ou accorde à l’oreille avec les cordes ci-dessus.',
+    tuner_absent: 'Aucun micro disponible sur cet appareil.', tuner_erreur: 'Impossible de démarrer le micro.',
+    tuner_ref: 'La4 de référence', tuner_ref_note: 'Les cordes, bourdons et chansons suivent cette référence.',
+    calib_titre: 'Caler sur l’accordéon', calib_aide: 'Fais sonner une note de l’accordéon (un Do par exemple) et laisse-la tenir.',
+    calib_mesure: 'Mesuré', calib_propose: 'La4 proposé', calib_appliquer: 'Appliquer', calib_reset: 'Revenir à 440 Hz',
+    calib_note: 'Un accordéon ne se réaccorde pas : c’est le violon qui s’y ajuste.',
   },
   en: {
     titre_court: 'Cadien Fiddle', titre: 'Cadien Fiddle, Day by Day', langue: 'Language',
@@ -90,6 +102,18 @@ const D = {
     nav_vocab: 'Glossary', vocab_titre: 'Seconding glossary', vocab_intro: 'The words come from the Dewey Balfa and Tracy Schwarz booklet (Folkways, 1976), with French equivalents still to be confirmed.', livre: 'In the booklet',
     plan_semaine: 'Week', plan_apercu: 'Preview: this lesson is not written yet.', triade: 'Triad',
     theme: 'Theme', th_drapeau: 'Flag', th_bayou: 'Bayou', th_papier: 'Old paper', th_minuit: 'Midnight', th_epure: 'Minimal',
+    // --- tuner / calibration (audio) ---
+    tuner_ouvrir: 'Microphone tuner (optional)', tuner_fermer: 'Close tuner', tuner_titre: 'Tuner',
+    tuner_demarrer: 'Turn on microphone', tuner_arret: 'Stop',
+    tuner_attente: 'Play an open string…', tuner_cible: 'Target string', tuner_cents: 'cents',
+    tuner_juste: 'In tune', tuner_bas: 'A little flat: tighten slightly', tuner_haut: 'A little sharp: loosen slightly',
+    tuner_tres_bas: 'Too flat: tighten', tuner_tres_haut: 'Too sharp: loosen',
+    tuner_refuse: 'Microphone denied. Allow it in your browser settings, or tune by ear with the strings above.',
+    tuner_absent: 'No microphone available on this device.', tuner_erreur: 'Could not start the microphone.',
+    tuner_ref: 'Reference A4', tuner_ref_note: 'The strings, drones and songs follow this reference.',
+    calib_titre: 'Match the accordion', calib_aide: 'Sound a note on the accordion (a C for example) and hold it.',
+    calib_mesure: 'Measured', calib_propose: 'Suggested A4', calib_appliquer: 'Apply', calib_reset: 'Back to 440 Hz',
+    calib_note: 'An accordion cannot be retuned: the fiddle adjusts to it.',
   },
 } as const
 
