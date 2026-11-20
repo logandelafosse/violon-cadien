@@ -1,6 +1,7 @@
 // Vocabulaire du seconding. Les termes anglais viennent du livret de Dewey Balfa et Tracy Schwarz
 // (Traditional Cajun Fiddle, Folkways FM 8361, 1976) ; les définitions sont écrites avec mes propres mots.
 // Les équivalents français (sauf « segondeur », mot du livret) sont des propositions à valider.
+// Relu contre le livret : doubling/unisons/octaves, bassing x3, shuffle (un long + deux courts), pied de la valse, « band G, fiddle A ».
 export interface Term { fr: string; en: string; livre: string; defFr: string; defEn: string }
 
 export const GLOSSARY: Term[] = [
@@ -17,8 +18,8 @@ export const GLOSSARY: Term[] = [
     defFr: 'Le violoneux qui joue le deuxième violon : il remplit la mélodie et donne le rythme. Le livret dit que c’est le nom utilisé en pays cadien.',
     defEn: 'The fiddler who plays the second fiddle: filling in the melody and providing the rhythm. The booklet says this is the name used in Cajun country.' },
   { fr: 'Seconder', en: 'Seconding / bassing the fiddle', livre: 'seconding the fiddle, bassing the fiddle',
-    defFr: 'Jouer sous le lead avec des accords précis. Les accords sont les mêmes que les doublings.',
-    defEn: 'Playing under the lead with definite chords. The chords are the same ones as the doublings.' },
+    defFr: 'Jouer sous le lead avec des accords précis, ceux des doublings. Le livret dit que deux violons ne jouent pas la même chose : l’un le lead, l’autre le second, ce qui remplit la mélodie et donne un rythme.',
+    defEn: 'Playing under the lead with definite chords, the same ones as the doublings. The booklet says two fiddlers do not play the same thing: one plays lead, the other seconds, filling in the melody and giving a rhythm.' },
   { fr: 'Basse droite', en: 'Straight bassing', livre: 'straight bassing',
     defFr: 'Faire sonner les cordes en remplissage derrière le lead, un coup d’archet à la fois.',
     defEn: 'Sounding the strings as a filler or backing for the lead fiddle, one stroke at a time.' },
@@ -26,11 +27,11 @@ export const GLOSSARY: Term[] = [
     defFr: 'Trouver la note du lead, puis se servir de l’archet pour le rythme, comme on gratte une guitare.',
     defEn: 'Finding the lead’s note, then using the bow for rhythm, like strumming a guitar.' },
   { fr: 'Archet shuffle', en: 'Shuffle bow bassing', livre: 'shuffle bow bassing',
-    defFr: 'Un long coup tiré qui roule sur les cordes graves, puis deux petits coups sciés sur les cordes aiguës ; le long coup suivant va dans l’autre sens. Le livret dit que c’est surtout une vieille technique cadienne.',
-    defEn: 'A long pulled stroke rolling over the low strings, then two short sawing strokes on the high strings; the next long stroke goes the other way. The booklet says this is mainly an old-time Cajun technique.' },
+    defFr: 'Un long coup tiré qui roule sur les trois cordes graves, puis deux petits coups sciés sur les cordes 1 et 2 ; le long coup suivant va dans l’autre sens. En valse, le livret le dit « ROH-dle-dee » et on change de sens après avoir touché la corde 1. Surtout une vieille technique cadienne.',
+    defEn: 'A long pulled stroke rolling over the three low strings, then two short sawing strokes on strings 1 and 2; the next long stroke goes the other way. In waltz the booklet says “ROH-dle-dee” and you change direction after touching the 1st string. Mainly an old-time Cajun technique.' },
   { fr: 'Le shuffle', en: 'The Nashville Shuffle', livre: 'Nashville Shuffle',
-    defFr: 'Un long coup d’archet suivi de deux courts : DAH-da-da. Le livret dit qu’il joue tout seul et laisse penser aux notes.',
-    defEn: 'One long bow stroke followed by two short ones: DAH-da-da. The booklet says it is almost automatic and lets you think about the notes.' },
+    defFr: 'Un long coup d’archet suivi de deux courts : DAH-da-da. Le livret dit qu’il devient automatique et laisse penser aux notes ; la difficulté est que les longs coups voisins vont en sens contraires.',
+    defEn: 'One long bow stroke followed by two short ones: DAH-da-da. The booklet says it becomes automatic and lets you think about the notes; the difficulty is that neighbouring long strokes go in opposite directions.' },
   { fr: 'Harmonie de ténor', en: 'Tenor harmony (modern 2nd fiddle)', livre: 'modern 2nd fiddle',
     defFr: 'Une façon plus moderne de seconder : le deuxième violon joue une harmonie de ténor par-dessus le lead.',
     defEn: 'A more modern way of seconding: the second fiddle plays a tenor harmony over the lead.' },
@@ -55,6 +56,12 @@ export const GLOSSARY: Term[] = [
   { fr: 'Le pied', en: 'The foot', livre: 'foot tapping',
     defFr: 'En valse cadienne le pied bat : trois – UN – (deux) – trois – UN. Le deux est silencieux, le trois est rapide et le UN est lourd et dur.',
     defEn: 'In Cajun waltz the foot goes: three – ONE – (two) – three – ONE. The two is silent, the three is quick and the ONE is heavy and hard.' },
+  { fr: 'Rouler l’archet', en: 'Rolling the bow', livre: 'roll the bow',
+    defFr: 'Faire passer l’archet sur plusieurs cordes pendant un seul long coup, de la plus grave vers la plus aiguë (ou l’inverse), pour obtenir des sons distincts.',
+    defEn: 'Moving the bow across several strings during one long stroke, from the lowest toward the highest (or back), to get distinct sounds.' },
+  { fr: 'Coup scié', en: 'Saw stroke', livre: 'short saw strokes',
+    defFr: 'Un petit coup d’archet court et rapide, bas-haut, sur les cordes aiguës ; dans le shuffle, il y en a deux après chaque long coup.',
+    defEn: 'A short, quick bow stroke, down–up, on the high strings; in the shuffle there are two after each long stroke.' },
   { fr: 'Glisser dans l’accord', en: 'Sliding into the chord', livre: 'hand sliding into the chords',
     defFr: 'Le livret insiste sur la main qui glisse vers les accords au lieu de sauter.',
     defEn: 'The booklet stresses the hand sliding into the chords rather than jumping.' },

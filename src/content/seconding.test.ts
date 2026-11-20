@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DOUBLING, CHORD_KEY, STYLES, strokes } from './seconding'
+import { DOUBLING, DOUBLING_ALT, DOUBLING_LOW_G, CHORD_KEY, STYLES, strokes } from './seconding'
 import { OUTLINE, WEEKS } from './curriculum'
 import { DAYS } from './days'
 import { GLOSSARY } from './glossary'
@@ -19,6 +19,36 @@ describe('doublings (livret Balfa)', () => {
     expect(position(64, 'C')).toEqual({ string: 1, finger: 2 })
     expect(position(71, 'C')).toEqual({ string: 2, finger: 2 })
     expect(position(58, 'F')).toEqual({ string: 0, finger: 3 })
+  })
+})
+
+describe('doublings relus sur les diagrammes du livret', () => {
+  it('Fa = La (corde de Fa doigt 2) + Do à vide ; Ré = Ré + La', () => {
+    expect(DOUBLING.F).toEqual([57, 60]); expect(DOUBLING.D).toEqual([62, 69])
+    expect(position(57, 'C')).toEqual({ string: 0, finger: 2 })
+  })
+  it('les formes alternatives du livret (Sol grave, Sol Si+Ré, Ré Fa♯+La) sont jouables', () => {
+    expect(DOUBLING_LOW_G).toEqual([55, 62]); expect(DOUBLING_ALT.G).toContainEqual([59, 62]); expect(DOUBLING_ALT.D).toEqual([[66, 69]])
+    for (const alts of Object.values(DOUBLING_ALT)) for (const [x, y] of alts) { expect(position(x, 'C')).not.toBeNull(); expect(position(y, 'C')).not.toBeNull() }
+  })
+  it('les deux notes de chaque doubling sont à une tierce, une quarte ou une quinte', () => {
+    for (const [x, y] of Object.values(DOUBLING)) expect([3, 4, 5, 7]).toContain(Math.abs(y - x))
+  })
+})
+
+describe('shuffle selon le livret : un long qui roule + deux courts', () => {
+  it('two-step : par temps, un roule puis deux courts', () => {
+    const st = strokes('shuffle', 2)
+    expect(st.map((k) => k.kind)).toEqual(['roule', 'court', 'court', 'roule', 'court', 'court'])
+    expect(st[0].d).toBeGreaterThan(st[1].d)
+  })
+  it('valse : un roule fort sur le 1 puis deux courts sur le 2 et le 3', () => {
+    const st = strokes('shuffle', 3)
+    expect(st.map((k) => [k.kind, k.t, k.fort])).toEqual([['roule', 0, true], ['court', 1, false], ['court', 2, false]])
+  })
+  it('basse droite : un coup par temps, premier temps fort', () => {
+    const st = strokes('droite', 3)
+    expect(st.length).toBe(3); expect(st.map((k) => k.fort)).toEqual([true, false, false])
   })
 })
 
