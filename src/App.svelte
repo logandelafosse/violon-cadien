@@ -1,6 +1,8 @@
 <script lang="ts">
   import { DAYS, TOTAL, dayOf } from './content/days'
-  import { load, save, today, nextDay, streak, type Progress } from './state/progress'
+  import { load, save, loadState, clear, nextDay, streak, markDone, undoDone, setRating, emptyProgress, type Progress } from './state/progress'
+  import { buildBackup, parseBackup, applyImport, type ImportResult } from './state/backup'
+  import { storageAvailable, requestPersist } from './state/storage'
   import StepCard from './ui/StepCard.svelte'
   import Songs from './ui/Songs.svelte'
   import Glossary from './ui/Glossary.svelte'
@@ -25,13 +27,46 @@
   const outlineOf = (n: number) => OUTLINE.find((o) => o.jour === n)
   const outlineTitle = (n: number) => { const o = outlineOf(n); return o ? (i18n.lang === 'en' ? o.titreEn : o.titre) : t('bientot') }
 
-  function done(n: number) { p.done[n] = { date: today() }; save(p) }
-  function undo(n: number) { delete p.done[n]; save(p) }
+  const commit = (np: Progress) => { p = np; save(p) }
+  const done = (n: number) => commit(markDone(p, n))
+  const undo = (n: number) => commit(undoDone(p, n))
+  const rate = (n: number, r: number) => commit(setRating(p, n, r))
   function exportData() {
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], { type: 'application/json' }))
+    const url = URL.createObjectURL(new Blob([JSON.stringify(buildBackup(p, { lang: i18n.lang, theme: theme.name }), null, 1)], { type: 'application/json' }))
+    a.href = url
     a.download = i18n.lang === 'en' ? 'cadien-fiddle-progress.json' : 'violon-cadien-progres.json'; a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
+  // Import / réinitialisation / état du stockage (Réglages)
+  let storageOk = $state(storageAvailable())
+  const loadProblem = loadState()
+  requestPersist()
+  let pending = $state<Extract<ImportResult, { ok: true }> | null>(null)
+  let importMsg = $state<{ ok: boolean; text: string } | null>(null)
+  let resetAsk = $state(false)
+  const errKey = { json: 'err_json', format: 'err_format', future: 'err_future', data: 'err_data' } as const
+  async function pickFile(e: Event & { currentTarget: HTMLInputElement }) {
+    const f = e.currentTarget.files?.[0]
+    e.currentTarget.value = ''
+    pending = null; importMsg = null
+    if (!f) return
+    let text = ''
+    try { text = await f.text() } catch { importMsg = { ok: false, text: t('import_ko') }; return }
+    const r = parseBackup(text, THEMES)
+    if (r.ok) pending = r
+    else importMsg = { ok: false, text: t(errKey[r.error]) + ' ' + t('import_ko') }
+  }
+  function doImport(mode: 'merge' | 'replace') {
+    if (!pending) return
+    commit(applyImport(p, pending.progress, mode))
+    if (mode === 'replace') {
+      if (pending.prefs.lang) setLang(pending.prefs.lang)
+      if (pending.prefs.theme) setTheme(pending.prefs.theme as (typeof THEMES)[number])
+    }
+    pending = null; importMsg = { ok: true, text: t('import_ok') }
+  }
+  function doReset() { clear(); p = emptyProgress(); save(p); resetAsk = false; importMsg = { ok: true, text: t('reset_done') } }
 </script>
 
 <main>
@@ -63,7 +98,7 @@
           {@const n = (w.semaine - 1) * 7 + k + 1}
           {@const d = dayOf(n)}
           <button class="cell" class:done={p.done[n]} class:soon={!d} onclick={() => go(`/jour/${n}`)} title={d?.titre ?? outlineTitle(n)}>
-            {n}{#if d?.type === 'revue'}<small>{t('revision')}</small>{/if}
+            {n}{#if d?.type === 'revue'}<small>{t('revision')}{#if p.done[n]?.rating} ★{p.done[n].rating}{/if}</small>{/if}
           </button>
         {/each}
       </div>
@@ -84,8 +119,32 @@
         </button>
       {/each}
     </div>
+    {#if !storageOk}<p class="warn" role="alert">{t('stockage_indispo')}</p>{/if}
+    {#if loadProblem === 'corrupt'}<p class="warn" role="alert">{t('stockage_corrompu')}</p>{/if}
+    {#if loadProblem === 'future'}<p class="warn" role="alert">{t('stockage_futur')}</p>{/if}
     <button class="big" onclick={exportData}>{t('exporter')}</button>
     <p class="note">{t('export_note')}</p>
+    <label class="big filebtn">{t('importer')}<input type="file" accept="application/json,.json" onchange={pickFile} hidden /></label>
+    <p class="note">{t('import_note')}</p>
+    {#if pending}
+      <div class="card" role="group" aria-label={t('importer')}>
+        <p>{t('import_trouve')} : <b>{Object.keys(pending.progress.done).length}</b></p>
+        <button class="big" onclick={() => doImport('merge')}>{t('import_fusion')}</button>
+        <button class="big done" onclick={() => doImport('replace')}>{t('import_remplace')}</button>
+        <p class="note">{t('import_prefs_note')}</p>
+        <button class="big done" onclick={() => (pending = null)}>{t('import_annule')}</button>
+      </div>
+    {/if}
+    {#if importMsg}<p class={importMsg.ok ? 'okmsg' : 'warn'} role="status">{importMsg.text}</p>{/if}
+    {#if resetAsk}
+      <div class="card" role="alertdialog" aria-label={t('reset')}>
+        <p>{t('reset_ask')}</p>
+        <button class="big danger" onclick={doReset}>{t('reset_confirm')}</button>
+        <button class="big done" onclick={() => (resetAsk = false)}>{t('import_annule')}</button>
+      </div>
+    {:else}
+      <button class="big done" onclick={() => (resetAsk = true)}>{t('reset')}</button>
+    {/if}
   {:else if day}
     <article>
       <p class="kicker">{t('semaine')} {day.semaine} · {t('jour_n')} {day.jour} · {day.type === 'revue' ? t('revue') : day.type === 'apprendre' ? t('apprendre') : t('pratiquer')} · ~{day.minutes} {t('min')}</p>
@@ -101,6 +160,17 @@
         <h3>{t('autoeval')}</h3>
         <ul>{#each day.autoeval as e}<li>{e}</li>{/each}</ul>
       </section>
+      {#if day.type === 'revue' && p.done[day.jour]}
+        <section class="card" aria-label={t('note_revue')}>
+          <p>{t('note_revue')}</p>
+          <div class="stars">
+            {#each [1, 2, 3, 4, 5] as r}
+              <button class:on={(p.done[day.jour].rating ?? 0) >= r} aria-pressed={p.done[day.jour].rating === r} aria-label="{t('note_n')} {r}/5" onclick={() => rate(day.jour, r)}>★</button>
+            {/each}
+          </div>
+          <p class="note">{t('note_effacer')}</p>
+        </section>
+      {/if}
       {#if p.done[day.jour]}
         <button class="big done" onclick={() => undo(day.jour)}>{t('fait_le')} {p.done[day.jour].date} — {t('annuler')}</button>
       {:else}
@@ -158,6 +228,13 @@
   .cell.soon { opacity: 0.45 }
   .wk { margin: 14px 0 6px; font-size: 0.95rem; color: var(--accent2) }
   .songlink { width: 100%; min-height: 48px; margin: 4px 0 8px; border-radius: 10px; border: 1px dashed var(--gold); background: transparent; color: inherit; font-size: 1rem }
+  .warn { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem }
+  .okmsg { color: var(--accent2); font-weight: 600 }
+  .filebtn { display: flex; align-items: center; justify-content: center; box-sizing: border-box; cursor: pointer; background: var(--card); color: inherit; border: 1px solid var(--line) }
+  .big.danger { background: var(--accent) }
+  .stars { display: flex; gap: 6px }
+  .stars button { flex: 1; min-height: 48px; font-size: 1.5rem; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: inherit; opacity: 0.55 }
+  .stars button.on { opacity: 1; color: var(--gold-text); border-color: var(--gold) }
   .note { opacity: 0.7; font-size: 0.9rem }
   nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: var(--card); border-top: 1px solid var(--line) }
   nav button { flex: 1; min-height: 56px; border: 0; background: transparent; color: inherit; font-size: 0.85rem; padding: 0 2px }
