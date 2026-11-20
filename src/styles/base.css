@@ -19,8 +19,6 @@ button, input, select, textarea { font: inherit; color: inherit }
 
 /* Accessibilité : focus visible, cibles tactiles, mouvement réduit */
 :focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 3px }
-.dot:focus-visible { outline: none }
-.dot:focus-visible circle { stroke: var(--fg); stroke-width: 3 }
 button, select, input[type='number'] { min-height: 44px }
 input[type='checkbox'] { width: 24px; height: 24px; vertical-align: middle }
 @media (prefers-reduced-motion: reduce) {
