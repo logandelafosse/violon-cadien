@@ -208,7 +208,7 @@
   .themesel { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700 }
   .themesel select { min-height: 36px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: inherit; font-size: 0.95rem; padding: 0 8px }
   .lang { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700 }
-  .lang span { opacity: 0.5 } .lang span.on { opacity: 1; color: var(--accent) }
+  .lang span.on { color: var(--accent) }
   .sw { position: relative; width: 48px; height: 26px; min-height: 0; border-radius: 13px; border: 1px solid var(--line); background: var(--board); padding: 0; cursor: pointer }
   .sw i { position: absolute; top: 2px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); transition: transform 0.15s }
   .sw[aria-checked='true'] i { transform: translateX(21px) }
