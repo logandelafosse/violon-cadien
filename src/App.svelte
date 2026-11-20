@@ -6,6 +6,7 @@
   import Glossary from './ui/Glossary.svelte'
   import { WEEKS, OUTLINE } from './content/curriculum'
   import { songsFor } from './content/songs'
+  import { stopAll } from './audio/engine'
   import { i18n, setLang, t, type Key } from './i18n.svelte'
   import { THEMES, SWATCH, theme, setTheme } from './theme.svelte'
   setLang(i18n.lang)
@@ -13,7 +14,7 @@
 
   let p = $state<Progress>(load())
   let route = $state(location.hash.slice(1) || '/')
-  window.addEventListener('hashchange', () => (route = location.hash.slice(1) || '/'))
+  window.addEventListener('hashchange', () => { stopAll(); route = location.hash.slice(1) || '/' })
   const go = (r: string) => { location.hash = r; window.scrollTo(0, 0) }
 
   const current = $derived(nextDay(p, TOTAL))
